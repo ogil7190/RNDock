@@ -70,11 +70,9 @@ class HomeScreen extends Component {
   }
 
   handleSubscription = () =>{
-    if(Platform.OS == 'android'){
-      FirebaseModule.subscribeTag('ogil');
-      FirebaseModule.subscribeTag('menime');
-      FirebaseModule.subscribeTags(['Fuck', 'ogil7190']);
-    }
+    FirebaseModule.subscribeTag('ogil');
+    FirebaseModule.subscribeTag('menime');
+    FirebaseModule.subscribeTags(['Fuck', 'ogil7190']);
   }
 
   update_user_token = async () => {
@@ -162,7 +160,7 @@ class HomeScreen extends Component {
 
   UNSAFE_componentWillMount = () => {
     DeviceEventEmitter.addListener('FCM_MSSG', function(e) {
-      console.log(JSON.stringify(e));
+      console.log('FROM NATIVE', JSON.stringify(e));
     });
   }
 

@@ -17,6 +17,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNGoogleSignin.h"
+#import "FirebaseModule.h"
 
 @import UserNotifications;
 
@@ -33,7 +34,6 @@ NSString *const kGCMMessageIDKey = @"gcm.message_id";
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
   NSURL *jsCodeLocation;
-  
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
   
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
@@ -81,14 +81,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
   [application registerForRemoteNotifications];
   // [END register_for_notifications]
-  [[FIRMessaging messaging] subscribeToTopic:@"ogil7190"
-                                  completion:^(NSError * _Nullable error) {
-                                    NSLog(@"Subscribed to ogil7190 topic");
-                                  }];
-  [[FIRMessaging messaging] subscribeToTopic:@"ogil"
-                                  completion:^(NSError * _Nullable error) {
-                                    NSLog(@"Subscribed to ogil7190 topic");
-                                  }];
   [FIRMessaging messaging].shouldEstablishDirectChannel = YES;
   return YES;
 }
@@ -189,6 +181,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 // To enable direct data messages, you can set [Messaging messaging].shouldEstablishDirectChannel to YES.
 - (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
   NSLog(@"Received data message: %@", remoteMessage.appData);
+  FirebaseModule *module = [FirebaseModule allocWithZone: nil];
+  [module tellJs:@"something"];
 }
 
 

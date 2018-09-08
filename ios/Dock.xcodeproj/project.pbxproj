@@ -64,6 +64,7 @@
 		E8C1F36EE6134D7D8B85EEB4 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 844C63496FA64BA6A2C44B5E /* Entypo.ttf */; };
 		ECDD9B341BE04601A0CD2D8C /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C0E6EEBD432F41BA90E2271A /* libc++.tbd */; };
 		F708EDFC21446BC700A44059 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F708EDFB21446BC600A44059 /* GoogleService-Info.plist */; };
+		F708EDFF2144811300A44059 /* FirebaseModule.m in Sources */ = {isa = PBXBuildFile; fileRef = F708EDFE2144811300A44059 /* FirebaseModule.m */; };
 		F767F592213FAE8800788BF5 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F767F52A213FA8C900788BF5 /* libBVLinearGradient.a */; };
 		F767F5DA213FB3B500788BF5 /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F767F5D9213FB38B00788BF5 /* libRNGoogleSignin.a */; };
 		F767F5E1213FB40700788BF5 /* GoogleNetworkingUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F767F5DB213FB40600788BF5 /* GoogleNetworkingUtilities.framework */; };
@@ -489,6 +490,8 @@
 		F208187233F44323A0F490BD /* RealmReact.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RealmReact.xcodeproj; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; };
 		F708EDFB21446BC600A44059 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F708EDFD21446EC700A44059 /* Dock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Dock.entitlements; path = Dock/Dock.entitlements; sourceTree = "<group>"; };
+		F708EDFE2144811300A44059 /* FirebaseModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FirebaseModule.m; path = Dock/FirebaseModule.m; sourceTree = "<group>"; };
+		F708EE002144817800A44059 /* FirebaseModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FirebaseModule.h; path = Dock/FirebaseModule.h; sourceTree = "<group>"; };
 		F767F524213FA8C800788BF5 /* BVLinearGradient.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BVLinearGradient.xcodeproj; path = "../node_modules/react-native-linear-gradient/BVLinearGradient.xcodeproj"; sourceTree = "<group>"; };
 		F767F5D4213FB38B00788BF5 /* RNGoogleSignin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGoogleSignin.xcodeproj; path = "../node_modules/react-native-google-signin/ios/RNGoogleSignin.xcodeproj"; sourceTree = "<group>"; };
 		F767F5DB213FB40600788BF5 /* GoogleNetworkingUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleNetworkingUtilities.framework; path = "../node_modules/react-native-google-signin/ios/GoogleSdk/GoogleNetworkingUtilities.framework"; sourceTree = "<group>"; };
@@ -667,6 +670,8 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				F708EDFB21446BC600A44059 /* GoogleService-Info.plist */,
+				F708EDFE2144811300A44059 /* FirebaseModule.m */,
+				F708EE002144817800A44059 /* FirebaseModule.h */,
 			);
 			name = Dock;
 			sourceTree = "<group>";
@@ -1579,6 +1584,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F708EDFF2144811300A44059 /* FirebaseModule.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);

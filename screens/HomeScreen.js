@@ -70,9 +70,11 @@ class HomeScreen extends Component {
   }
 
   handleSubscription = () =>{
-    FirebaseModule.subscribeTag('ogil');
-    FirebaseModule.subscribeTag('menime');
-    FirebaseModule.subscribeTags(['Fuck', 'ogil7190']);
+    if(Platform.OS == 'android'){
+      FirebaseModule.subscribeTag('ogil');
+      FirebaseModule.subscribeTag('menime');
+      FirebaseModule.subscribeTags(['Fuck', 'ogil7190']);
+    }
   }
 
   update_user_token = async () => {

@@ -24,7 +24,7 @@ class FlatCard extends Component {
   render() {    
     return (
       <TouchableWithoutFeedback onPress={ () => this.props.onPress(this.card)}>
-        <View ref={(viewRef) => this.card = viewRef} style = {{height : 300, marginTop : 8, marginBottom : 8}}>
+        <View ref={(viewRef) => this.card = viewRef} style = {{height : 300, marginTop : 5, marginBottom : 5}}>
           <Card style = {{borderRadius : 12, overflow : 'hidden', elevation : 5}}>
             <CardItem cardBody style={{borderRadius : 12,}}>
               <FastImage

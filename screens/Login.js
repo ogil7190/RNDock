@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet, Platform, StatusBar, View, Image, AsyncStorage} from 'react-native';
+import {StyleSheet, Platform, StatusBar, View, Image, AsyncStorage, ToastAndroid} from 'react-native';
 import { Text, Button, Spinner } from 'native-base';
 import { GoogleSignin } from 'react-native-google-signin';
 import PropTypes from 'prop-types';
@@ -84,7 +84,8 @@ class Login extends Component {
   }
 
   signIn = async (data)=>{
-    axios.post('https://mycampusdock.com/auth/android/signin', {email : data.email}).then((response) =>{
+    ToastAndroid.show('We have:'+JSON.stringify(data), ToastAndroid.LONG);
+    axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then((response) =>{
       this.setState({loading : false});
       this.props.login_success(data, response.data.token);
       if(response.data.newUser){
@@ -114,16 +115,19 @@ class Login extends Component {
   googleSignIn = async () => {
     this.setState({loading : true});
     try {
+      ToastAndroid.show('Error BEFORE', ToastAndroid.LONG);
       const user = await GoogleSignin.signIn();
+      ToastAndroid.show('Error AFTER', ToastAndroid.LONG);
       this.signIn(user);
     } catch (error) {
+      ToastAndroid.show('Error :'+error, ToastAndroid.LONG);
       if (error.code === 'CANCELED') {
         error.message = 'user canceled the login flow';
       }
-      this.setState({
-        loading: false 
-      });
     }
+    this.setState({
+      loading: false 
+    });
   };
 
   googleSignOut = async () => {
@@ -175,7 +179,6 @@ class Login extends Component {
 
   logout = () =>{
     this.googleSignOut();
-    this.unsaveUser();
   }
 
   loading = (loading) => {
@@ -243,8 +246,7 @@ class Login extends Component {
           </Button>
         </View>
         <Text 
-          style={styles.help_text} 
-          onPress={this.logout}>
+          style={styles.help_text}>
           Need Any Help?
         </Text>
         <Spinner animating={this.state.loading}/>

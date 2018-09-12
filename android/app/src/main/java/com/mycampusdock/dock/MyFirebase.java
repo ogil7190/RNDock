@@ -64,7 +64,7 @@ public class MyFirebase extends FirebaseMessagingService {
         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
-    public static final String REACH_URL = "https://mycampusdock.com/android/reach";
+    public static final String REACH_URL = "https://mycampusdock.com/general/reach";
     public void dataReached(String id){
         MainApplication app = (MainApplication) getApplication();
         HashMap<String, String> params = new HashMap<>();
@@ -104,6 +104,6 @@ public class MyFirebase extends FirebaseMessagingService {
     private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
         NotiUtil notificationUtils = new NotiUtil(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils. .showNotificationMessage(title, message, timeStamp, intent, imageUrl);
+        notificationUtils.showNotificationMessage(title, message, timeStamp, intent, imageUrl);
     }
 }

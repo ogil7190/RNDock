@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Text, Container, Content, Header, Icon } from 'native-base';
+import { ScrollView, Text, Platform, View, StatusBar, RefreshControl, AsyncStorage, FlatList } from 'react-native';
+// import {  Icon } from 'native-base';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Platform, View, StatusBar, RefreshControl, AsyncStorage, FlatList } from 'react-native';
 import FlatCardChannel from './components/FlatCardChannel';
 import { DeviceEventEmitter } from 'react-native';
 import axios from 'axios';
@@ -175,8 +175,8 @@ class HomeScreen extends Component {
   render() {
     const event_list = this.state.event_list === null ? [] : this.state.event_list;
     return(
-      <Container>
-        <Header style = {{ backgroundColor : 'rgb(73, 166, 232)', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20}}>
+      <View style={{ flex: 1 }}>
+        {/* <Header style = {{ backgroundColor : 'rgb(73, 166, 232)', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20}}>
           <StatusBar
             backgroundColor="rgb(73, 166, 232)"
             translucent
@@ -191,8 +191,8 @@ class HomeScreen extends Component {
             </Text>
             <Icon style={{ color : '#fff', fontSize:30}} name='bookmark' />
           </View>
-        </Header>
-        <Content
+        </Header> */}
+        <ScrollView
           style = {{backgroundColor: '#fff'}}
           refreshControl={
             <RefreshControl
@@ -207,9 +207,8 @@ class HomeScreen extends Component {
           </Text>
           <FlatList
             keyExtractor={(item, index) => index.toString()}
-            data={[{ image : 'https://imagens.canaltech.com.br/137091.237729-Logos-estilo-Instagram.png', title : 'Facebook Developer Meet', channel : 'Facebook', data : 'Something', url : 'Something'},
-              { image : 'https://static1.squarespace.com/static/52bcb171e4b0207b1fe5f639/58627b46bebafb6533b0da67/5873f30315d5db147f3bd03a/1483993868090/Website+Background.png?format=2500w', title : 'MKBHD Pixel 3 Unboxing 2018', channel : 'MKBHD', data : 'Something', url : 'Something'},
-              { image : 'https://1.bp.blogspot.com/-AOh_vBqtgQE/Wx-uUmRbeAI/AAAAAAAAxDY/s9eoWuunEnUP3Jo92Be4xOqoVm7Mcr9EwCLcBGAs/s728-e100/android-adb-hack.png', title : 'Everything about Android Pie', channel : 'Google Android', data : 'Something', url : 'Something'}]}
+            data={[{ image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel : 'Dock', data : 'Something', url : 'Something'},
+              { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', channel : 'Dock Manager', data : 'Something', url : 'Something'}]}
             horizontal = {true}
             style = {{marginLeft : 15}}
             showsHorizontalScrollIndicator = {false}
@@ -226,8 +225,8 @@ class HomeScreen extends Component {
             style = {{marginLeft : 15, marginRight : 15}}
             showsHorizontalScrollIndicator = {false}
             renderItem={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {'OGIL'} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
-        </Content>
-      </Container>
+        </ScrollView>
+      </View>
     );
   }
 }

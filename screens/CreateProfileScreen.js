@@ -58,7 +58,7 @@ class CreateProfileScreen extends Component {
       if(this.state.imageFile !== null) {
         formData.append('image0',{ uri: this.state.imageFile, type: 'image/jpeg', name: 'user' });
       }
-      const response = await axios.post('https://mycampusdock.com/auth/android/new-user', formData, {
+      const response = await axios.post('https://mycampusdock.com/auth/new-user', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-access-token': this.state.token

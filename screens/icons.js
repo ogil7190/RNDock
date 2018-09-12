@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg,{ G, Path, Rect} from 'react-native-svg';
+import Svg,{ G, Path, Rect, Use, Defs} from 'react-native-svg';
 
 const Icons = {
   logo_white : 

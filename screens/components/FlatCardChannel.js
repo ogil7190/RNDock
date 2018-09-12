@@ -1,13 +1,34 @@
 import React, { Component } from 'react';
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, AsyncStorage } from 'react-native';
 import { Card, CardItem, Text, Icon } from 'native-base';
 import PropTypes from 'prop-types';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
+import axios from 'axios';
 
 class FlatCardChannel extends Component {
   constructor(props){
     super(props);
+    this.state = {
+      subscribed_icon : 'add-circle',
+    };
+  }
+
+  handleSubscription = async () =>{
+    const str = await AsyncStorage.getItem('data');
+    const data = JSON.parse(str);
+    const token = data.token;
+    const channel = this.props.channel;
+    const response = await axios.post('https://mycampusdock.com/channels/user/susbcribe', { channel }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      }
+    });
+    console.log(response);
+    if(!response.data.error){
+      this.setState({subscribed_icon : 'checkmark-circle'});
+    }
   }
 
   render() {
@@ -34,7 +55,7 @@ class FlatCardChannel extends Component {
                   style={{color : 'white', flex:1, textAlign:'left', fontSize : 12, fontWeight : '500'}}>
                   {this.props.channel}
                 </Text>
-                <Icon size={15} name="checkmark-circle" style={{color:'white'}} />
+                <Icon size={15} name={this.state.subscribed_icon} style={{color:'white'}} onPress={this.handleSubscription}/>
               </View>
               <Text 
                 style={{color : 'white', marginLeft : 10, marginRight : 10, marginTop : 50, fontSize : 14}}>

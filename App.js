@@ -18,6 +18,8 @@ import logger from 'redux-logger';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Icon } from 'native-base';
 
+// import { FluidNavigator } from ''
+
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );
 
 const IconBottomNav = (name, tintColor) => <Icon name={name} style={{ color: tintColor }}/>;

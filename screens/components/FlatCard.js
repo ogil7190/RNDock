@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { View, TouchableWithoutFeedback } from 'react-native';
-import { Card, CardItem, Text, Icon } from 'native-base';
+import { Text, View, TouchableWithoutFeedback } from 'react-native';
+// import { Card, CardItem, Icon } from 'native-base';
 import PropTypes from 'prop-types';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
+import { Transition } from 'react-navigation-fluid-transitions';
 
 class FlatCard extends Component {
   constructor(props){
@@ -25,8 +26,8 @@ class FlatCard extends Component {
     return (
       <TouchableWithoutFeedback onPress={ () => this.props.onPress(this.card)}>
         <View ref={(viewRef) => this.card = viewRef} style = {{height : 300, marginTop : 5, marginBottom : 5}}>
-          <Card style = {{borderRadius : 12, overflow : 'hidden', elevation : 5}}>
-            <CardItem cardBody style={{borderRadius : 12,}}>
+          <View style = {{borderRadius : 12, overflow : 'hidden', elevation : 5}}>
+            <View style={{borderRadius : 8,}}>
               <FastImage
                 style={{height: 300, width: '100%', flex: 1, position :'absolute',  borderRadius:12}}
                 source={{
@@ -42,6 +43,7 @@ class FlatCard extends Component {
               }}>
                 <View style={{flexDirection :'row', marginLeft :15, marginRight : 0, marginTop:10}}>
                   <View style={{flexDirection : 'row', flex:1}}>
+                    
                     <FastImage
                       style= {{width : 36, height : 36, borderRadius : 25}}
                       source={{
@@ -56,11 +58,13 @@ class FlatCard extends Component {
                     </Text>
                   </View>
                 </View>
+
                 <Text 
                   style={{color : 'white', marginLeft : 15, marginRight : 15, marginTop : 80, fontSize : 25, fontWeight : '500'}}>
                   {this.props.title}
                 </Text>
-                <Text 
+
+                {/* <Text 
                   style={{color : 'white', marginLeft : 15, marginRight : 15, marginTop : 40, fontSize : 15}}>
                   <Icon name='pin' style={{color:'white', fontSize:20}}/>
                   {'  '+this.props.data.location}
@@ -71,10 +75,10 @@ class FlatCard extends Component {
                   {
                     '  '+('' + this.props.data.date).substring(0, 15)
                   }
-                </Text>
+                </Text> */}
               </LinearGradient>
-            </CardItem>
-          </Card>
+            </View>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     );

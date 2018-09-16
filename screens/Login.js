@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import {StyleSheet, Platform, StatusBar, View, Image, AsyncStorage, ToastAndroid} from 'react-native';
-import { Text, Button, Spinner } from 'native-base';
+import { Text, TouchableOpacity, StyleSheet, Platform, StatusBar, View, Image, ActivityIndicator, AsyncStorage} from 'react-native';
 import { GoogleSignin } from 'react-native-google-signin';
 import PropTypes from 'prop-types';
 import { AUTH_USER } from '../constants';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import Icons from './icons';
-//import { LoginManager, AccessToken, GraphRequest,GraphRequestManager } from 'react-native-fbsdk';
 import axios from 'axios';
 import {StackActions, NavigationActions} from 'react-navigation';
 
@@ -21,9 +19,6 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.signIn = this.signIn.bind(this);
-    //this.handleFbLogin = this.handleFbLogin.bind(this);
-    //this.fbLogin = this.fbLogin.bind(this);
-    //this.fetchData = this.fetchData.bind(this);
     this.loading = this.loading.bind(this);
     this.state = {
       user: null,
@@ -84,10 +79,9 @@ class Login extends Component {
   }
 
   signIn = async (data)=>{
-    ToastAndroid.show('We have:'+JSON.stringify(data), ToastAndroid.LONG);
     axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then((response) =>{
-      this.setState({loading : false});
       this.props.login_success(data, response.data.token);
+      this.setState({loading : false});
       if(response.data.newUser){
         const actionToDispatch = StackActions.reset({
           index: 0,
@@ -100,7 +94,7 @@ class Login extends Component {
         const actionToDispatch = StackActions.reset({
           index: 0,
           key: null,
-          actions: [NavigationActions.navigate({ routeName: 'Main' })],
+          actions: [NavigationActions.navigate({ routeName: 'Main', })],
         });
         this.props.navigation.dispatch(actionToDispatch);
       }
@@ -115,12 +109,9 @@ class Login extends Component {
   googleSignIn = async () => {
     this.setState({loading : true});
     try {
-      ToastAndroid.show('Error BEFORE', ToastAndroid.LONG);
       const user = await GoogleSignin.signIn();
-      ToastAndroid.show('Error AFTER', ToastAndroid.LONG);
       this.signIn(user);
     } catch (error) {
-      ToastAndroid.show('Error :'+error, ToastAndroid.LONG);
       if (error.code === 'CANCELED') {
         error.message = 'user canceled the login flow';
       }
@@ -155,28 +146,6 @@ class Login extends Component {
     }
   }
 
-  // fetchData = () =>{
-  //   const handleFbLogin = this.handleFbLogin;
-  //   AccessToken.getCurrentAccessToken().then(
-  //     (data) => {
-  //       let accessToken = data.accessToken;
-  //       const infoRequest = new GraphRequest(
-  //         '/me',
-  //         {
-  //           accessToken: accessToken,
-  //           parameters: {
-  //             fields: {
-  //               string: 'email,name,first_name,middle_name,last_name,picture.width(720).height(720)'
-  //             }
-  //           }
-  //         },
-  //         handleFbLogin
-  //       );
-  //       new GraphRequestManager().addRequest(infoRequest).start();
-  //     }
-  //   );
-  // }
-
   logout = () =>{
     this.googleSignOut();
   }
@@ -184,27 +153,6 @@ class Login extends Component {
   loading = (loading) => {
     this.setState({loading});
   }
-
-  // fbLogin = () =>{
-  //   const fetchData = this.fetchData;
-  //   this.setState({ loading: true });
-  //   const loading = this.loading;
-  //   LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-  //     .then(
-  //       function (result) {
-  //         if (result.isCancelled) {
-  //           console.log('Login cancelled');
-  //           loading(false);
-  //         } else {
-  //           fetchData();
-  //         }
-  //       }, 
-  //       function (error) {
-  //         console.log('Login fail with error: ' + error);
-  //         this.setState({ loading: false });
-  //       }
-  //     );
-  // }
 
   render() {
     return(
@@ -214,42 +162,41 @@ class Login extends Component {
           backgroundColor={'transparent'}
           translucent
           barStyle="light-content"/>
-        <Text style = {styles.title}>Hi there,{'\n'}Welcome to Dock!</Text>
-        <View style={styles.icon_container}>
-          <View style={styles.icon}>
-            <Icon_student />
+        <View style={{flex : 3}}>
+          <Text style = {styles.title}>{"It's always about You!"}</Text>
+          <View style={styles.icon_container}>
+            <View style={styles.icon}>
+              <Icon_student />
+            </View>
+            <View style={styles.icon}>
+              <Icon_inst />
+            </View>
+            <View style={styles.icon}>
+              <Logo_white />
+            </View>
+            <View style={styles.icon}>
+              <Icon_trophy />
+            </View>
+            <View style={styles.icon}>
+              <Icon_book />
+            </View>
           </View>
-          <View style={styles.icon}>
-            <Icon_inst />
-          </View>
-          <View style={styles.icon}>
-            <Logo_white />
-          </View>
-          <View style={styles.icon}>
-            <Icon_trophy />
-          </View>
-          <View style={styles.icon}>
-            <Icon_book />
-          </View>
+          <Text style = {styles.slogan}>Knowledge is power, Information is liberating.</Text>
+          <ActivityIndicator size="large" color="#00ff00" animating={this.state.loading}/>
         </View>
-        <Text style = {styles.slogan}>Knowledge is power, Information is liberating.</Text>
         <View style = {styles.action_container}>
-          <Button 
-            light 
+          <Text style={styles.welcome}>Welcome to Dock</Text>
+          <Text style={styles.hint}>Tap button below for One-Tap-Login</Text>
+          <TouchableOpacity 
             disabled = {this.state.loading}
             style={styles._button} 
             onPress={this.googleSignIn}>
             <Image
-              style = {{ marginLeft : 10, width: 32, height: 32}}
+              style = {{ marginLeft : 10, width: 32, height: 32, tintColor : '#fff'}}
               source={require('./images/google.png')}/>
             <Text style={styles.btn_style}>Continue with Google</Text>
-          </Button>
+          </TouchableOpacity>
         </View>
-        <Text 
-          style={styles.help_text}>
-          Need Any Help?
-        </Text>
-        <Spinner animating={this.state.loading}/>
       </LinearGradient>);
   }
 }
@@ -257,23 +204,23 @@ class Login extends Component {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingLeft: 15,
-    paddingRight: 15
   },
   icon_container : {
     justifyContent:'center', 
     alignItems: 'center', 
-    marginTop: 30, 
+    marginTop: 40,
     flexDirection : 'row'
   },
   icon:{
-    marginLeft:10, 
+    marginLeft:10,
     marginRight:10
   },
   title :{
     color : '#ffffff',
-    marginTop : 60,
-    fontSize: 30 
+    marginTop : 80,
+    textAlign : 'center',
+    fontWeight : Platform.OS === 'android'?'200' : '300',
+    fontSize: 32 
   },
   slogan :{
     color : '#ffffff',
@@ -284,29 +231,42 @@ const styles = StyleSheet.create({
     marginBottom : 25,
     fontSize: 15
   },
-  help_text :{
-    color : '#dfdfdf',
-    justifyContent :'center',
-    alignItems : 'center',
-    textAlign : 'center',
-    marginTop : 10,
-    fontSize: 15
-  },
   _button : {
     height: 50,
-    width: '100%',
-    borderRadius : 10,
+    borderRadius : 12,
+    alignItems : 'center',
+    flexDirection : 'row',
+    backgroundColor : 'rgb(31, 31, 92)',
+    width : '100%',
   },
   action_container : {
-    marginTop : 20,
+    paddingTop : 20,
+    flex : 1, 
     width: '100%',
-    paddingLeft : 20,
-    paddingRight: 20
+    borderTopLeftRadius : 12, 
+    borderTopRightRadius : 12,
+    elevation : 8,
+    shadowOpacity : 0.5, 
+    shadowOffset : {width : 1, height : 1},
+    backgroundColor : '#eee',
+    paddingLeft : 40,
+    paddingRight: 40
   },
   btn_style: {
-    flex: 1,
-    paddingLeft : 30,
-    paddingRight: 30
+    fontSize : 18,
+    color : '#fff',
+    paddingLeft : 20
+  },
+  welcome : {
+    fontSize : 25,
+    marginBottom : 10,
+    textAlign : 'center'
+  },
+  hint : {
+    fontSize : 12,
+    color : 'grey',
+    marginBottom : 20,
+    textAlign : 'center'
   }
 });
 

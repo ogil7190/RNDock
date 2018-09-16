@@ -1,24 +1,20 @@
 import React, {Component} from 'react';
 import { applyMiddleware, createStore, combineReducers } from 'redux';
-import { Root } from 'native-base';
 import auth from './reducers/auth';
 import general from './reducers/general';
 import { Provider } from 'react-redux';
 import { createStackNavigator } from 'react-navigation';
 import Login from './screens/Login';
-import CreateEventScreen from './screens/CreateEventScreen';
 import EventDetailScreen from './screens/EventDetailScreen';
-import EventDetails from './screens/EventDetails';
-import UpdateEventScreen from './screens/UpdateEventScreen';
 import CreateProfileScreen from './screens/CreateProfileScreen';
 import HomeScreen from './screens/HomeScreen';
 import ChannelScreen from './screens/ChannelScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import logger from 'redux-logger';
+import {DeviceEventEmitter} from 'react-native';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Icon } from 'native-base';
-
-// import { FluidNavigator } from ''
+import Icon from 'react-native-ionicons';
+import CheckOutEvent from './screens/CheckOutEvent';
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );
 
@@ -28,7 +24,7 @@ const Screens = createStackNavigator({
   Login: { screen: Login},
   Main: { 
     screen: createBottomTabNavigator({
-      HomeScreen: { 
+      HomeScreen: {
         screen: HomeScreen,
         navigationOptions: {
           title: 'Home',
@@ -54,22 +50,29 @@ const Screens = createStackNavigator({
       header: null,
     }),
   },
-
-  //EventDetails: {screen: EventDetails},
-  CreateEventScreen: { screen: CreateEventScreen },
   EventDetailScreen: { screen: EventDetailScreen },
-  UpdateEventScreen: { screen: UpdateEventScreen },
-  CreateProfileScreen : {screen : CreateProfileScreen}
+  CreateProfileScreen : {screen : CreateProfileScreen},
+  CheckOutEvent : { screen : CheckOutEvent}
 });
 
 export default class App extends Component {
+
+  UNSAFE_componentWillMount(){
+    DeviceEventEmitter.addListener('FCM_MSSG', function(e) {
+      console.log(e);
+    });
+  }
+
+  componentWillUnmount(){
+    DeviceEventEmitter.removeAllListeners('FCM_MSSG', function(e){
+      console.log('Removed');
+    });
+  }
+  
   render() {
-    
     return(
       <Provider store={store}>
-        <Root>
-          <Screens/>
-        </Root>
+        <Screens/>
       </Provider>
     );
   }

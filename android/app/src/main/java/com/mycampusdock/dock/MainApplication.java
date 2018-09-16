@@ -12,20 +12,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.react.ReactApplication;
-import com.horcrux.svg.SvgPackage;
-
-import co.apptailor.googlesignin.RNGoogleSigninPackage;
-
-import com.BV.LinearGradient.LinearGradientPackage;
-
 import io.realm.react.RealmReactPackage;
-
+import com.BV.LinearGradient.LinearGradientPackage;
+import com.imagepicker.ImagePickerPackage;
+import co.apptailor.googlesignin.RNGoogleSigninPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
+import com.horcrux.svg.SvgPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.imagepicker.ImagePickerPackage; // <-- add this import
-import com.dylanvann.fastimage.FastImageViewPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,14 +45,14 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
-                    new MainReactPackage(),
-                    new SvgPackage(),
-                    new RNGoogleSigninPackage(),
-                    new LinearGradientPackage(),
-                    new RealmReactPackage(),
-                    new ImagePickerPackage(),
-                    new FastImageViewPackage(),
-                    new DockPackage()
+                new MainReactPackage(),
+                new RealmReactPackage(),
+                new SvgPackage(),
+                new LinearGradientPackage(),
+                new ImagePickerPackage(),
+                new RNGoogleSigninPackage(),
+                new FastImageViewPackage(),
+                new DockPackage()
             );
         }
 

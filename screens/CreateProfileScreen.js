@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {View, Platform, AsyncStorage, StatusBar, TouchableOpacity} from 'react-native';
+import {Text, View, Platform, AsyncStorage, Image, ActionSheetIOS, TextInput, StatusBar, Picker, ScrollView, TouchableOpacity} from 'react-native';
 import PropTypes from 'prop-types';
 import { AUTH_USER } from '../constants';
 import ImagePicker from 'react-native-image-picker';
-import { Text, Item, Thumbnail, Icon, Input, Form, Picker, Grid, Col, Button, Row, Spinner, Container, Content } from 'native-base';
 import axios from 'axios';
 import {StackActions, NavigationActions} from 'react-navigation';
 import LinearGradient from 'react-native-linear-gradient';
 import FirebaseModule from './FirebaseModule';
+import Icon from 'react-native-ionicons';
 
-colleges = {
+const colleges = {
   'Select College' : 'Select College',
   'MRIIRS' : 'Manav Rachna International Institute of Research & Studies',
   'MREI': 'Manav Rachna Educational Institute'
@@ -81,9 +81,7 @@ class CreateProfileScreen extends Component {
   }
 
   handleSubscription = () =>{
-    FirebaseModule.subscribeTag('ogil');
-    FirebaseModule.subscribeTag('menime');
-    FirebaseModule.subscribeTags(['Fuck', 'ogil7190']);
+    
   }
 
   update = async (data) =>{
@@ -154,7 +152,21 @@ class CreateProfileScreen extends Component {
     });
   }
 
+  collegeAction = () =>{
+    var selections = ['Cancel'];
+    Object.entries(colleges).map( (data) => selections.push(data[0]));
+    ActionSheetIOS.showActionSheetWithOptions({
+      options: selections,
+      cancelButtonIndex: 0,
+    },
+    (buttonIndex) => {
+      if(buttonIndex != 0)
+        this.setState({college : selections[buttonIndex]});
+    });
+  }
+
   render() {
+    console.log(this.state.imageFile);
     return(
       <LinearGradient colors={['rgb(31, 31, 92)', 'rgb(73, 166, 232)']} 
         style={{flex: 1}}>
@@ -162,73 +174,77 @@ class CreateProfileScreen extends Component {
           backgroundColor={'transparent'}
           translucent
           barStyle="light-content"/>
-        <Container style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, flex : 1}}>
-          <Content
+        <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, flex : 1}}>
+          <ScrollView
             scrollEventThrottle={5}>
-            <Form style = {{ marginTop : 10, flex : 1}}> 
-
-              <Item style={{ marginTop:10, marginBottom:10, marginLeft:15, marginRight:15, overflow: 'hidden' }}>
+            <View style = {{ marginTop : 10, flex : 1}}> 
+              <View style={{ marginTop:10, marginBottom:10, marginLeft:15, marginRight:15, overflow: 'hidden' }}>
                 <View style={{ backgroundColor: 'transparent', flex: 1}}>
                   <Text
                     style={{borderColor : '#fff', color : '#fff', fontSize : 18, fontWeight : '100',  textAlign : 'center'}}>
-                  Update Profile
+                      Update Your Profile
                   </Text>  
                 </View>
-              </Item>
+              </View>
 
-              <Item style={{justifyContent : 'center', backgroundColor : '#fff', borderRadius:8, marginTop:5, marginRight : 15}}>
-                <TouchableOpacity key={1} onPress={this.handlePicUpload}>  
+              <View style={{justifyContent : 'center', backgroundColor : '#fff', borderRadius:8, marginTop:5, marginRight : 15, marginLeft : 15}}>
+                <TouchableOpacity onPress={this.handlePicUpload}>  
                   <View>
-                    <Thumbnail style={{marginTop:10, width : 90, height : 90}} large source={{uri: this.state.imageFile == null ?  this.state.pic : this.state.imageFile}} />
+                    <Image style={{marginTop:10, width : 90, height : 90, borderRadius : 45, alignSelf:'center'}} source={{uri: this.state.imageFile === null ?  this.state.pic : this.state.imageFile}} />
                     <Text style={{marginBottom : 5, textAlign : 'center', color:'rgb(73, 166, 232)', marginTop: 5}} onPress={this.handlePicUpload}>Select Pic</Text>
                   </View>
                 </TouchableOpacity>
-              </Item>
+              </View>
 
-              <Item error = {this.state.name_check} style={{ backgroundColor: '#fff', marginTop:15, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden' }}>
-                <Icon size={20} style={{ paddingLeft: 20, paddingRight: 20, width: 60  }} name="person" />
-                <View style={{ backgroundColor: 'transparent', height: 50, flex: 1}}>
-                  <Input
-                    style={{paddingLeft : 10, borderColor : 'transparent'}}
+              <View style={{ backgroundColor: '#fff', marginTop:15, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center' }}>
+                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding:8, color : this.state.name_check ? '#f00' : '#000'}} name="person" />
+                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
+                  <TextInput
+                    style={{paddingLeft : 10,textAlignVertical : 'center', fontSize : 18}}
                     maxLength={50}
+                    returnKeyType = "next"
                     placeholder="Your Full Name"
                     value={this.state.name}
                     onChangeText={(text) => this.handleChange('name', text)}
                   />  
                 </View>
-              </Item>
+              </View>
         
-              <Item error = {this.state.email_check}  style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden' }}>
-                <Icon size={20} style={{ paddingLeft: 20, paddingRight: 20, width: 60  }} name="mail" />
-                <View style={{ backgroundColor: 'transparent', height: 50, flex: 1}}>
-                  <Input
-                    disabled
-                    style={{paddingLeft : 10}}
+              <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
+                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.email_check ? '#f00' : '#000' }} name="mail" />
+                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
+                  <TextInput
+                    editable = {false}
+                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18}}
                     maxLength={50}
                     placeholder="Your E-mail"
+                    returnKeyType = "next"
                     value={this.state.email}
                     onChangeText={(text) => this.handleChange('email', text)}
                   />  
                 </View>
-              </Item>
+              </View>
 
-              <Item error = {this.state.mobile_check} style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden' }}>
-                <Icon size={20} style={{paddingLeft: 20, paddingRight: 20, width: 60  }} name="call" />
-                <View style={{ backgroundColor: 'transparent',  height: 50, flex: 1}}>
-                  <Input
-                    style={{paddingLeft : 10}}
-                    maxLength={50}
-                    placeholder="Your Mobile Number"
+              <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
+                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.mobile_check ? '#f00' : '#000' }} name="call" />
+                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
+                  <TextInput
+                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18}}
+                    maxLength={10}
+                    placeholder="Your Mobile"
+                    keyboardType = "phone-pad"
+                    returnKeyType = "next"
+                    value={this.state.mobile}
                     onChangeText={(text) => this.handleChange('mobile', text)}
                   />  
                 </View>
-              </Item>
+              </View>
 
-              <Item error = {this.state.college_check} style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden' }}>
-                <Icon size={20} style={{paddingLeft: 20, paddingRight: 20, width: 60  }} name="school" />
-                <View style={{ backgroundColor: 'transparent', height: 50, flex: 1}}>
-                  <Picker
-                    style={{}}
+
+              <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
+                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.college_check ? '#f00' : '#000' }} name="school" />
+                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
+                  {Platform.OS === 'android' ? <Picker
                     mode="dropdown"
                     placeholder="Select College"
                     disabled = {this.state.loading}
@@ -239,37 +255,45 @@ class CreateProfileScreen extends Component {
                     {
                       Object.entries(colleges).map( (data, index) => <Picker.Item label= {data[1]} value={data[0]} key = {index} />)
                     }
-                  </Picker>
+                  </Picker> :
+                    <Text
+                      style={{paddingLeft : 10, textAlignVertical : 'center', color : '#000', fontSize : 18}}
+                      onPress = {this.collegeAction}
+                      numberOfLines = {1}
+                      ellipsizeMode = "tail">{this.state.college}</Text>
+                  }
                 </View>
-              </Item>
+              </View>
 
-              <Grid style={{ backgroundColor:'transparent', flex : 1 }}>
-                <Col>
-                  <Row style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden'}}>
-                    <Col style={{ justifyContent: 'center', padding : 5 }}>
+              <View style={{ backgroundColor:'transparent', flex : 1, }}>
+                <View style={{flexDirection : 'row'}}>
+                  <View style={{ backgroundColor: '#fff', flex : 1, marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', justifyContent: 'center'}}>
+                    <View style={{ justifyContent: 'center', flex : 1, padding : 5 }}>
                       <Icon name="male" style={{ textAlign: 'center', fontSize: 36, }} />
                       <Text style={{ textAlign: 'center'}}>Male</Text>
                       <Icon name={ this.state.gender === 'M' ? 'radio-button-on' : 'radio-button-off' } style={{ textAlign: 'center', }} onPress={ () => this.setState({ gender: 'M' }) } />
-                    </Col>
-                    <Col style={{justifyContent: 'center', padding : 5 }}>
+                    </View>
+                    <View style={{justifyContent: 'center', flex:1, padding : 5 }}>
                       <Icon name="female" style={{ textAlign: 'center', fontSize: 36,  }} />
                       <Text style={{ textAlign: 'center'}}>Female</Text>
                       <Icon name={ this.state.gender === 'F' ? 'radio-button-on' : 'radio-button-off' } style={{ textAlign: 'center', }} onPress={ () => this.setState({ gender: 'F' }) } />
-                    </Col>
-                  </Row>
-                  <Row style={{ flex : 1, marginBottom : 20,  justifyContent: 'center', alignItems : 'center', backgroundColor:'transparent'}}>
-                    <Button disabled = {this.state.loading} rounded style={{ backgroundColor: '#fff', marginTop : 20, padding : 10}} iconRight onPress={this.handleSubmit}>
-                      <Text style={{color:'black'}}>
-                    Continue
+                    </View>
+                  </View>
+                </View>
+                <View style={{ marginBottom : 20, backgroundColor:'transparent',padding : 5}}>
+                  <TouchableOpacity disabled = {this.state.loading} style={{ justifyContent: 'center', alignItems : 'center',  marginTop : 20, padding : 10, }} iconRight onPress={this.handleSubmit}>
+                    <View style={{flexDirection : 'row', backgroundColor: '#fff', borderRadius : 12, padding: 5}}>
+                      <Text style={{color:'black', padding: 5,  fontSize : 20,  textAlign : 'center', textAlignVertical : 'center'}}>
+                        {'Continue '}
                       </Text>
-                      <Icon name="arrow-forward" size ={30} style= {{ textAlign : 'center', color : 'black'}}/>
-                    </Button>
-                  </Row>
-                </Col>
-              </Grid>
-            </Form>
-          </Content>
-        </Container>
+                      <Icon name="arrow-forward" style= {{ textAlign : 'center', fontSize : 25, color : 'black', padding: 5}}/>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
       </LinearGradient>
     );
   }

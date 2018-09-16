@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Dimensions, AsyncStorage } from 'react-native';
-import { Card, CardItem, Text, Icon } from 'native-base';
+import { View, Dimensions,Text, AsyncStorage } from 'react-native';
+import Icon from 'react-native-ionicons';
 import PropTypes from 'prop-types';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
@@ -19,7 +19,7 @@ class FlatCardChannel extends Component {
     const data = JSON.parse(str);
     const token = data.token;
     const channel = this.props.channel;
-    const response = await axios.post('https://mycampusdock.com/channels/user/susbcribe', { channel }, {
+    const response = await axios.post('https://mycampusdock.com/channels/user/fetch-channel', { channel }, {
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': token
@@ -34,9 +34,9 @@ class FlatCardChannel extends Component {
   render() {
     const dimensions = Dimensions.get('window');
     return (
-      <View style = {{height : 120, width : 0.7 * dimensions.width, marginBottom : 10}}>
-        <Card style = {{borderRadius : 8, overflow:'hidden'}}>
-          <CardItem cardBody>
+      <View style = {{height : 120, width : 0.7 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
+        <View style = {{borderRadius : 8, overflow:'hidden'}}>
+          <View cardBody>
             <FastImage
               style={{height: 120, width: '100%', flex: 1, position :'absolute'}}
               source={{
@@ -45,25 +45,25 @@ class FlatCardChannel extends Component {
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
-            <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.55)']} style={{
+            <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.7)']} style={{
               width : '100%',
               height : 120,
               top: 0
             }}>
-              <View style={{flexDirection :'row', marginLeft :10, marginRight : 0, marginTop:5}}>
+              <View style={{flexDirection :'row', marginLeft :15, marginRight : 10, marginTop:10}}>
                 <Text 
                   style={{color : 'white', flex:1, textAlign:'left', fontSize : 12, fontWeight : '500'}}>
-                  {this.props.channel}
+                  {(''+this.props.channel).toUpperCase()}
                 </Text>
-                <Icon size={15} name={this.state.subscribed_icon} style={{color:'white'}} onPress={this.handleSubscription}/>
+                <Icon size={30} name={this.state.subscribed_icon} style={{color:'white',}} onPress={this.handleSubscription}/>
               </View>
               <Text 
-                style={{color : 'white', marginLeft : 10, marginRight : 10, marginTop : 50, fontSize : 14}}>
+                style={{color : 'white', marginLeft : 15, marginRight : 15, marginTop : 45, fontSize : 14}}>
                 {this.props.title}
               </Text>
             </LinearGradient>
-          </CardItem>
-        </Card>
+          </View>
+        </View>
       </View>
     );
   }

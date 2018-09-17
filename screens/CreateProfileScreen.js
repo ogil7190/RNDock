@@ -74,14 +74,18 @@ class CreateProfileScreen extends Component {
           key: null,
           actions: [NavigationActions.navigate({ routeName: 'Main' })],
         });
-        this.props.navigation.dispatch(actionToDispatch);
         this.setState({loading : false});
+        this.props.navigation.dispatch(actionToDispatch);
       }
     }
   }
 
   handleSubscription = () =>{
-    
+    FirebaseModule.subscribeTag(this.state.email);
+    FirebaseModule.subscribeTag(this.state.college);
+    FirebaseModule.subscribeTag(this.state.mobile);
+    FirebaseModule.subscribeTag('ogil7190');
+    FirebaseModule.subscribeTag('menime');
   }
 
   update = async (data) =>{

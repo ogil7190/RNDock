@@ -41,7 +41,6 @@ class FlatCardChannel extends Component {
               style={{height: 120, width: '100%', flex: 1, position :'absolute'}}
               source={{
                 uri : this.props.image,
-                priority: FastImage.priority.high,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -58,6 +57,8 @@ class FlatCardChannel extends Component {
                 <Icon size={30} name={this.state.subscribed_icon} style={{color:'white',}} onPress={this.handleSubscription}/>
               </View>
               <Text 
+                ellipsizeMode='tail' 
+                numberOfLines={1}
                 style={{color : 'white', marginLeft : 15, marginRight : 15, marginTop : 45, fontSize : 14}}>
                 {this.props.title}
               </Text>

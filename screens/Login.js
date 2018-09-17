@@ -23,6 +23,7 @@ class Login extends Component {
     this.state = {
       user: null,
       error: null,
+      error_text : null,
       loading: true,
     };
   }
@@ -79,6 +80,7 @@ class Login extends Component {
   }
 
   signIn = async (data)=>{
+    this.setState({error_text : null});
     axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then((response) =>{
       this.props.login_success(data, response.data.token);
       this.setState({loading : false});
@@ -98,12 +100,15 @@ class Login extends Component {
         });
         this.props.navigation.dispatch(actionToDispatch);
       }
+    }).catch((err)=>{
+      console.log(err);
+      this.setState({error_text : 'Check your Internet!'});
     });
   }
 
   update = async (data) =>{
-    await AsyncStorage.setItem('data', data);
     console.log('Data updated : ', data);
+    await AsyncStorage.setItem('data', data);
   }
 
   googleSignIn = async () => {
@@ -183,6 +188,7 @@ class Login extends Component {
           </View>
           <Text style = {styles.slogan}>Knowledge is power, Information is liberating.</Text>
           <ActivityIndicator size="large" color="#00ff00" animating={this.state.loading}/>
+          <Text style = {styles.error_style}>{this.state.error_text}</Text>
         </View>
         <View style = {styles.action_container}>
           <Text style={styles.welcome}>Welcome to Dock</Text>
@@ -266,6 +272,11 @@ const styles = StyleSheet.create({
     fontSize : 12,
     color : 'grey',
     marginBottom : 20,
+    textAlign : 'center'
+  },
+  error_style : {
+    fontSize : 15,
+    color : 'red',
     textAlign : 'center'
   }
 });

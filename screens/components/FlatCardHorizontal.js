@@ -48,7 +48,6 @@ class FlatCard extends Component {
                 style={{height : 220, width : '100%', position :'absolute',  borderRadius:10}}
                 source={{
                   uri : this.props.image,
-                  priority: FastImage.priority.high,
                 }}
                 resizeMode={FastImage.resizeMode.cover}
               />

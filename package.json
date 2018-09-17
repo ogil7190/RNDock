@@ -24,6 +24,7 @@
     "react-native-image-picker": "^0.26.10",
     "react-native-ionicons": "^0.2.2",
     "react-native-linear-gradient": "^2.4.0",
+    "react-native-modal": "^6.5.0",
     "react-native-snackbar-component": "^1.0.9",
     "react-native-step-indicator": "0.0.9",
     "react-native-svg": "^6.5.2",

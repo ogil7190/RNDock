@@ -15,6 +15,7 @@ import {DeviceEventEmitter} from 'react-native';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-ionicons';
 import CheckOutEvent from './screens/CheckOutEvent';
+import PreviewChannel from './screens/PreviewChannel';
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );
 
@@ -52,7 +53,8 @@ const Screens = createStackNavigator({
   },
   EventDetailScreen: { screen: EventDetailScreen },
   CreateProfileScreen : {screen : CreateProfileScreen},
-  CheckOutEvent : { screen : CheckOutEvent}
+  CheckOutEvent : { screen : CheckOutEvent},
+  PreviewChannel : { screen : PreviewChannel}
 });
 
 export default class App extends Component {

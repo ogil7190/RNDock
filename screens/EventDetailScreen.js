@@ -88,6 +88,7 @@ class EventDetailScreen extends Component {
           el.audience = JSON.stringify(el.audience);
           el.timestamp = new Date(el.timestamp);
           el.date = new Date(el.date);
+          el['enrolled'] = '100'; // 100 for not enrolled
           el.reg_end = new Date(el.reg_end);
           el.reg_start = new Date(el.reg_start);
           el.enrollees = JSON.stringify(el.enrollees);

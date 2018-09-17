@@ -11,11 +11,118 @@ import HomeScreen from './screens/HomeScreen';
 import ChannelScreen from './screens/ChannelScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import logger from 'redux-logger';
-import {DeviceEventEmitter} from 'react-native';
+import {DeviceEventEmitter, Dimensions, SafeAreaView, View, Image, ScrollView} from 'react-native';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-ionicons';
 import CheckOutEvent from './screens/CheckOutEvent';
-import PreviewChannel from './screens/PreviewChannel';
+import ChannelActivity from './screens/ChannelActivity';
+import ChannelEvents from './screens/ChannelEvents';
+import { createDrawerNavigator, DrawerItems, createMaterialTopTabNavigator } from 'react-navigation';
+import MyEvents from './screens/MyEvents';
+import Settings from './screens/Settings';
+import Bookmarks from './screens/Bookmarks';
+
+const DrawerComponent = (props) =>(
+  <SafeAreaView style={{flex : 1}}>
+    <View style={{height : 150, backgroundColor : 'rgb(31, 31, 92)', justifyContent : 'center', alignItems : 'center', paddingTop : 20, paddingBottom :20}}>
+      <Image source={require('./screens/images/icon.png')} style={{height : 100, width : 100, borderRadius : 50, tintColor : '#fff'}} />
+    </View>
+    <ScrollView>
+      <DrawerItems {...props}/>
+    </ScrollView>
+  </SafeAreaView>
+);
+
+const Nav = createDrawerNavigator({
+  HomeScreen: {
+    screen: HomeScreen,
+  },
+  MyEvents : {
+    screen: MyEvents,
+    navigationOptions: {
+      title : 'My Events',
+      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
+    }
+  },
+  Bookmarks : {
+    screen : Bookmarks,
+    navigationOptions: {
+      title : 'My Bookmarks',
+      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
+    }
+  },
+  Settings : {
+    screen : Settings,
+    navigationOptions: {
+      title : 'My Settings',
+      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
+    }
+  }
+},{
+  contentComponent : DrawerComponent,
+  drawerWidth: Dimensions.get('window').width - 100
+});
+
+const Nav2 = createDrawerNavigator({
+  ChannelScreen: {
+    screen: ChannelScreen,
+  },
+  MyEvents : {
+    screen: MyEvents,
+    navigationOptions: {
+      title : 'My Events',
+      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
+    }
+  },
+  Bookmarks : {
+    screen : Bookmarks,
+    navigationOptions: {
+      title : 'My Bookmarks',
+      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
+    }
+  },
+  Settings : {
+    screen : Settings,
+    navigationOptions: {
+      title : 'My Settings',
+      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
+    }
+  }
+},{
+  contentComponent : DrawerComponent,
+  drawerWidth: Dimensions.get('window').width - 100
+});
+
+const Nav3 = createDrawerNavigator({
+  ProfileScreen: {
+    screen: ProfileScreen,
+  },
+  MyEvents : {
+    screen: MyEvents,
+    navigationOptions: {
+      title : 'My Events',
+      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
+    }
+  },
+  Bookmarks : {
+    screen : Bookmarks,
+    navigationOptions: {
+      title : 'My Bookmarks',
+      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
+    }
+  },
+  Settings : {
+    screen : Settings,
+    navigationOptions: {
+      title : 'My Settings',
+      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
+    }
+  }
+},{
+  contentComponent : DrawerComponent,
+  drawerWidth: Dimensions.get('window').width - 100
+});
+
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );
 
@@ -26,21 +133,21 @@ const Screens = createStackNavigator({
   Main: { 
     screen: createBottomTabNavigator({
       HomeScreen: {
-        screen: HomeScreen,
+        screen: Nav,
         navigationOptions: {
           title: 'Home',
           tabBarIcon: ({ tintColor }) => IconBottomNav('home', tintColor)
         }
       },
       ChannelScreen: { 
-        screen: ChannelScreen,
+        screen: Nav2,
         navigationOptions: {
           title: 'Channels',
           tabBarIcon: ({ tintColor }) => IconBottomNav('glasses', tintColor)
         }
       },
       ProfileScreen: { 
-        screen: ProfileScreen,
+        screen: Nav3,
         navigationOptions: {
           title: 'Profile',
           tabBarIcon: ({ tintColor }) => IconBottomNav('person', tintColor)
@@ -54,7 +161,19 @@ const Screens = createStackNavigator({
   EventDetailScreen: { screen: EventDetailScreen },
   CreateProfileScreen : {screen : CreateProfileScreen},
   CheckOutEvent : { screen : CheckOutEvent},
-  PreviewChannel : { screen : PreviewChannel}
+  ChannelDetailScreen : { screen :createMaterialTopTabNavigator({
+    ChannelActivity : {
+      screen : ChannelActivity
+    },
+    ChannelEvents : {
+      screen : ChannelEvents
+    }
+  }, {
+    swipeEnabled : false,
+    animationEnabled : false,
+    optimizationsEnabled : true,
+
+  })}
 });
 
 export default class App extends Component {
@@ -67,7 +186,7 @@ export default class App extends Component {
 
   componentWillUnmount(){
     DeviceEventEmitter.removeAllListeners('FCM_MSSG', function(e){
-      console.log('Removed');
+      console.log('Removed', e);
     });
   }
   

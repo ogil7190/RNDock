@@ -52,22 +52,10 @@ const Activity = {
   }
 };
 
-const Channels = {
-  name: 'Channels',
-  primaryKey: '_id',
-  properties: {
-    description: 'string',
-    name: 'string',
-    subscribed : 'string',
-    subscribers: 'string',
-    _id:  'string',
-  }
-};
-
 export default {
   getRealm: (callback) => { 
     if(realmdb === null) {
-      return Realm.open({schema: [Events, Activity, Channels], deleteRealmIfMigrationNeeded: true })
+      return Realm.open({schema: [Events], deleteRealmIfMigrationNeeded: true })
         .then(realm => {
           realmdb = realm;
           callback(realmdb);

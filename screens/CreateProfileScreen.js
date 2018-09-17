@@ -195,7 +195,7 @@ class CreateProfileScreen extends Component {
                 <TouchableOpacity onPress={this.handlePicUpload}>  
                   <View>
                     <Image style={{marginTop:10, width : 90, height : 90, borderRadius : 45, alignSelf:'center'}} source={{uri: this.state.imageFile === null ?  this.state.pic : this.state.imageFile}} />
-                    <Text style={{marginBottom : 5, textAlign : 'center', color:'rgb(73, 166, 232)', marginTop: 5}} onPress={this.handlePicUpload}>Select Pic</Text>
+                    <Text style={{marginBottom : 5, textAlign : 'center', color:'rgb(31, 31, 92)', marginTop: 5}} onPress={this.handlePicUpload}>Select Pic</Text>
                   </View>
                 </TouchableOpacity>
               </View>

@@ -33,6 +33,10 @@ class HomeScreen extends Component {
     callback(result);
   }
 
+  static navigationOptions = {
+    drawerLabel: () => null
+  }
+
   state = {
     isRefreshing: false,
     event_list: null,
@@ -126,7 +130,6 @@ class HomeScreen extends Component {
 
       let Events = realm.objects('Events').sorted('timestamp');
       process_realm_obj(Events, (result) => {
-        console.log('Data', result);
         this.setState({ event_list: result.reverse() });
       });  
     });
@@ -135,14 +138,14 @@ class HomeScreen extends Component {
   render() {
     const event_list = this.state.event_list === null ? [] : this.state.event_list;
     return(
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1,backgroundColor : '#fff'}}>
         <StatusBar
-          backgroundColor="rgb(73, 166, 232)"
+          backgroundColor="rgb(31, 31, 92)"
           translucent
           barStyle="light-content"/>
-        <View style = {{ backgroundColor : 'rgb(73, 166, 232)', height : 75, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.8, shadowOffset : {width : 2, height : 5}, elevation : 6}}>
-          <View style = {{ marginTop : Platform.OS === 'android' ? 25 : 10, flex : 1, flexDirection : 'row', paddingBottom : 5, shadowOpacity : 0.3,}}>
-            <TouchableOpacity onPress = {()=>console.log('Menu works here!')}>
+        <View style = {{ backgroundColor : 'rgb(31, 31, 92)', height : 75, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.6, shadowOffset : {width : 1, height : 1}, elevation : 6}}>
+          <View style = {{ marginTop : Platform.OS === 'android' ? 25 : 10, flex : 1, flexDirection : 'row', paddingBottom : 5,}}>
+            <TouchableOpacity onPress = {()=>this.props.navigation.openDrawer()}>
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
@@ -152,27 +155,27 @@ class HomeScreen extends Component {
           </View>
         </View>
         <ScrollView
-          style = {{backgroundColor: '#fff'}}
+          style = {{backgroundColor: 'transparent'}}
           refreshControl={
             <RefreshControl
-              colors={['rgb(73, 166, 232)']}
+              colors={['rgb(31, 31, 92)']}
               refreshing={this.state.isRefreshing}
               onRefresh={this.update_event_list.bind(this)}
             />
           }>
-          <Text style={{fontSize : 18, marginLeft :22, marginTop : 5, marginBottom:5}}>
+          <Text style={{fontSize : 18, marginLeft :16, marginTop : 5, marginBottom:5}}>
             Channel Updates
             <Text  style={{color : 'red', fontSize : 25}}> • </Text>
           </Text>
           <FlatList
             keyExtractor={(item, index) => index.toString()}
-            data={[{ image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel : 'ogil7190', data : 'Something', url : 'Something'},
-              { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', channel : 'menime', data : 'Something', url : 'Something'}]}
+            data={[{ image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel : 'ogil7190', name : 'OGIL7190', data : 'Something', url : 'Something'},
+              { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', name : 'Menime', channel : 'menime', data : 'Something', url : 'Something'}]}
             horizontal = {true}
             showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCardChannel image = {item.image} title = {item.title} channel = {item.channel} data = {item.data} url = {item.url} />}
+            renderItem={({item}) => <FlatCardChannel image = {item.image} title = {item.title} channel = {item.channel} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {item})} />}
           />
-          <Text style={{fontSize : 18, marginLeft : 22, marginTop : 5, marginBottom : 5}}>
+          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
             All about Today
             <Text  style={{color : 'red', fontSize : 25}}> • </Text>
           </Text>
@@ -184,18 +187,31 @@ class HomeScreen extends Component {
             showsHorizontalScrollIndicator = {false}
             renderItem={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
 
-          <Text style={{fontSize : 18, marginLeft : 22, marginTop : 5, marginBottom : 5}}>
+          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
+            From Your Channels
+            <Text  style={{color : 'red', fontSize : 25}}> • </Text>
+          </Text>
+          
+          <FlatList
+            keyExtractor={(item) => item._id}
+            data={event_list.slice(2, 5)}
+            horizontal = {true}
+            showsHorizontalScrollIndicator = {false}
+            renderItem={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+
+          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
             Upcoming Events
             <Text  style={{color : 'red', fontSize : 25}}> • </Text>
           </Text>
           
           <FlatList
             keyExtractor={(item) => item._id}
-            data={event_list}
-            style = {{marginLeft : 20, marginRight : 20}}
+            data={event_list.slice(3,6)}
+            style = {{marginLeft : 15, marginRight : 20}}
             showsHorizontalScrollIndicator = {false}
             renderItem={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
         </ScrollView>
+
       </View>
     );
   }

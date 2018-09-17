@@ -65,7 +65,7 @@ class FlatCard extends Component {
                     {this.props.title}
                   </Text>
                 </View>
-                <View style={{flex : 1, marginLeft : 20, marginBottom:5, marginRight :10}}>
+                <View style={{flex : 1, marginLeft : 20, marginBottom:10, marginRight :20}}>
                   <Text style={{color : '#efefef', fontSize : 15, fontWeight : '500'}} ellipsizeMode='tail' numberOfLines={1}>
                     { this.parseDate(this.props.data.date) + ' • ' + this.parseTime(this.props.data.date)+ ' • ' + this.props.data.location}
                   </Text>

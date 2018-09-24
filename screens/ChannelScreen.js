@@ -28,6 +28,14 @@ class ChannelScreen extends Component {
     }
   }
 
+  UNSAFE_componentWillMount(){
+    console.log('Mounted');
+  }
+
+  componentWillUnmount(){
+    console.log('Unmounted');
+  }
+
   process_realm_obj = (RealmObject, callback) => {
     var result = Object.keys(RealmObject).map(function(key) {
       return {...RealmObject[key]};

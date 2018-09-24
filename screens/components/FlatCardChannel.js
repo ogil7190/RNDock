@@ -16,7 +16,7 @@ class FlatCardChannel extends Component {
     const dimensions = Dimensions.get('window');
     return (
       <TouchableOpacity onPress={()=>this.props.onPress()}>
-        <View style = {{height : 100, width : 0.4 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
+        <View style = {{height : 100, width : 0.45 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
           <View style = {{borderRadius : 8, overflow:'hidden'}}>
             <View>
               <FastImage

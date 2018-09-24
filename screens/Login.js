@@ -261,7 +261,8 @@ const styles = StyleSheet.create({
   btn_style: {
     fontSize : 18,
     color : '#fff',
-    paddingLeft : 20
+    textAlign : 'center',
+    flex : 1,
   },
   welcome : {
     fontSize : 25,

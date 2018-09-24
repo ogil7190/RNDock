@@ -45,7 +45,6 @@ class CreateProfileScreen extends Component {
   }
 
   handleSubmit = async ()=>{
-    console.log('token', this.state.token);
     if(this.checkFields()){
       this.setState({loading : true});
       const formData = new FormData();
@@ -170,7 +169,6 @@ class CreateProfileScreen extends Component {
   }
 
   render() {
-    console.log(this.state.imageFile);
     return(
       <LinearGradient colors={['rgb(31, 31, 92)', 'rgb(73, 166, 232)']} 
         style={{flex: 1}}>
@@ -201,7 +199,7 @@ class CreateProfileScreen extends Component {
               </View>
 
               <View style={{ backgroundColor: '#fff', marginTop:15, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center' }}>
-                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding:8, color : this.state.name_check ? '#f00' : '#000'}} name="person" />
+                <Icon style={{ paddingLeft: 20, padding:8, color : this.state.name_check ? '#f00' : '#000'}} name="person" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
                     style={{paddingLeft : 10,textAlignVertical : 'center', fontSize : 18}}
@@ -215,7 +213,7 @@ class CreateProfileScreen extends Component {
               </View>
         
               <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
-                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.email_check ? '#f00' : '#000' }} name="mail" />
+                <Icon style={{ paddingLeft: 20, padding: 8, color : this.state.email_check ? '#f00' : '#000' }} name="mail" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
                     editable = {false}
@@ -230,7 +228,7 @@ class CreateProfileScreen extends Component {
               </View>
 
               <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
-                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.mobile_check ? '#f00' : '#000' }} name="call" />
+                <Icon style={{ paddingLeft: 20, padding: 8, color : this.state.mobile_check ? '#f00' : '#000' }} name="call" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
                     style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18}}
@@ -246,7 +244,7 @@ class CreateProfileScreen extends Component {
 
 
               <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
-                <Icon style={{ paddingLeft: 20, paddingRight: 20, padding: 8, color : this.state.college_check ? '#f00' : '#000' }} name="school" />
+                <Icon style={{ paddingLeft: 20, padding: 8, color : this.state.college_check ? '#f00' : '#000' }} name="school" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   {Platform.OS === 'android' ? <Picker
                     mode="dropdown"

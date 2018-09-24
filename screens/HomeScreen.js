@@ -26,6 +26,14 @@ class HomeScreen extends Component {
     }
   }
 
+  UNSAFE_componentWillMount(){
+    console.log('Mounted');
+  }
+
+  componentWillUnmount(){
+    console.log('Unmounted');
+  }
+
   process_realm_obj = (RealmObject, callback) => {
     var result = Object.keys(RealmObject).map(function(key) {
       return {...RealmObject[key]};
@@ -58,14 +66,6 @@ class HomeScreen extends Component {
       await this.update_event_list();
     } catch(Exception) {
       console.log(Exception);
-    }
-  }
-
-  unsaveUser = async ()=>{
-    try {
-      await AsyncStorage.clear();
-    } catch (error) {
-      console.log(error);
     }
   }
 
@@ -149,7 +149,7 @@ class HomeScreen extends Component {
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity onPress = {()=>console.log('Search works here!')}>
+            <TouchableOpacity>
               <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
@@ -173,7 +173,7 @@ class HomeScreen extends Component {
               { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', name : 'Menime', channel : 'menime', data : 'Something', url : 'Something'}]}
             horizontal = {true}
             showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCardChannel image = {item.image} title = {item.title} channel = {item.channel} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {item})} />}
+            renderItem={({item}) => <FlatCardChannel image = {item.image} title = {item.title} channel = {item.channel} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {item, title : item.title})} />}
           />
           <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
             All about Today

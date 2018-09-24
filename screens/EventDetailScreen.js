@@ -274,7 +274,7 @@ class EventDetailScreen extends Component {
             marginLeft: 10
           }}>
             <Transition shared='event-title'>
-              <Text style={{ fontSize: 22, textAlign: 'left', marginLeft:10, marginRight : 10, fontWeight: '500'}}>{item.title}</Text>
+              <Text style={{ fontSize: 22, textAlign: 'left', marginLeft:10, marginRight : 10, marginTop : 10, fontWeight: '500'}}>{item.title}</Text>
             </Transition>
           </Animated.View>
           <View style={{ margin:15, padding : 5, backgroundColor : '#efefef', borderRadius : 12 }}>

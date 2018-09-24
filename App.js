@@ -172,7 +172,6 @@ const Screens = createStackNavigator({
     swipeEnabled : false,
     animationEnabled : false,
     optimizationsEnabled : true,
-
   })}
 });
 

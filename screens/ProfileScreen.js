@@ -10,7 +10,8 @@ class ProfileScreen extends Component {
     super(props);
     this.state = {
       user  : '',
-      loaded : false
+      loaded : false,
+      isRefreshing : false
     };
   }
 
@@ -21,7 +22,7 @@ class ProfileScreen extends Component {
   async componentDidMount(){
     const str = await AsyncStorage.getItem('data');
     const data = JSON.parse(str);
-    console.log('data');
+    console.log(data);
     if(this.state.user === ''){
       this.setState({user : data.data, loaded : true});
     }
@@ -35,9 +36,14 @@ class ProfileScreen extends Component {
     }
   }
 
+  getRandom = () =>{
+    return Math.floor(Math.random() * 10);
+  }
+
   render() {
+    console.log(this.state.user);
     return(
-      <View style={{ flex: 1,backgroundColor : '#fff'}}>
+      <View style={{ flex: 1, backgroundColor : '#efefef' }}>
         <StatusBar
           backgroundColor="rgb(31, 31, 92)"
           translucent
@@ -48,33 +54,47 @@ class ProfileScreen extends Component {
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity onPress = {()=>console.log('Search works here!')}>
+            <TouchableOpacity onPress={()=>this.unsaveUser()}>
               <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
         </View>
-        <ScrollView
-          style = {{backgroundColor: 'transparent'}}>
-          <View>
-            <View style={{justifyContent : 'center', alignContent : 'center', flexDirection : 'row'}}>
-              <FastImage
-                style={{borderRadius : 50, width : 100, height : 100, margin : 15}}
-                source={{
-                  uri : this.state.loaded ? this.state.user.media.length > 0 ? 'https://mycampusdock.com/' + this.state.media[0] : this.state.user.pic : 'none',
-                  priority: FastImage.priority.high,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
-            </View>
-            <Text style={{fontSize : 18, textAlign : 'center', flexDirection : 'row'}}>{this.state.user.name}</Text>
-            <Text style={{fontSize : 18, marginTop : 10, color : '#c5c5c5', textAlign : 'center', flexDirection : 'row'}}>{this.state.user.email}</Text>
-            <Text style={{fontSize : 18, marginTop : 10, color : '#c5c5c5', textAlign : 'center', flexDirection : 'row'}}>{this.state.user.mobile}</Text>
-            <Text style={{fontSize : 18, marginTop : 10, color : '#c5c5c5', textAlign : 'center', flexDirection : 'row'}}>{this.state.user.college}</Text>
-            <TouchableOpacity style={{backgroundColor : 'rgb(31, 31, 92)', margin : 20, flexDirection : 'row', padding : 5, borderRadius : 10}}>
-              <Text style={{textAlign : 'center', flex : 1, color : '#fff', fontSize : 15, margin : 5}} onPress={()=>this.unsaveUser()}>LOGOUT</Text>
+        <View style={{padding : 20, backgroundColor : '#fff'}}>
+          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
+            <FastImage
+              style={{height: 72, width: 72, borderRadius : 40,}}
+              source={{
+                uri : this.state.loaded ? 'https://mycampusdock.com/' + this.state.user.media[0] : '',
+                priority : FastImage.priority.high
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <Text style={{fontSize : 18, textAlign : 'left', textAlignVertical : 'center', marginLeft : 10}}>{this.state.user.name}</Text>
+          </View>
+          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
+            <Text style={{textAlign : 'center'}} numberOfLines = {2} ellipsizeMode = 'tail'>{'Its my fucking bio'}</Text>
+          </View>
+          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
+              <Text style={{fontSize : 15, textAlign : 'center', margin : 4}}>{this.state.isRefreshing ? 'Loading' : '3'}</Text>
+              <Icon name = 'people' style={{margin : 5, fontSize : 25}}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5, justifyContent : 'center'}} onPress = {()=>console.log('FUCK')}>
+              <Text style={{fontSize : 15, textAlign : 'center', margin : 4}}>{ this.state.isRefreshing ? 'Loading' : 'Subscribed'}</Text>
+              <Icon name = {this.state.loaded ? 'checkmark' : 'lock' } style={{margin : 5, fontSize : 25}}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
+              <Text style={{fontSize : 15, textAlign : 'center',  margin : 4}}>{this.state.isRefreshing ? 'Loading' : 'Settings'}</Text>
+              <Icon name = 'settings' style={{margin : 5, fontSize : 25}}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
+              <Icon name = 'more' style={{margin : 5, fontSize : 25}}/>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </View>
     );
   }

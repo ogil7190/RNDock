@@ -135,8 +135,17 @@ class HomeScreen extends Component {
     });
   }
 
+  unsaveUser = async ()=>{
+    try {
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   render() {
     const event_list = this.state.event_list === null ? [] : this.state.event_list;
+    StatusBar.setHidden(false);
     return(
       <View style={{ flex: 1,backgroundColor : '#fff'}}>
         <StatusBar
@@ -149,7 +158,7 @@ class HomeScreen extends Component {
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>this.unsaveUser()}>
               <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
             </TouchableOpacity>
           </View>

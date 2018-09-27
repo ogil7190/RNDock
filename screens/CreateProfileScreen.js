@@ -25,7 +25,6 @@ class CreateProfileScreen extends Component {
       email : this.props.auth.data.email,
       mobile : '',
       pic : this.props.auth.data.photo === undefined ? this.props.auth.data.picture.data.url : this.props.auth.data.photo,
-      imageFile : null,
       college : 'Select College',
       gender: 'M',
       loading : false,
@@ -54,8 +53,8 @@ class CreateProfileScreen extends Component {
       formData.append('gender', this.state.gender);
       formData.append('mobile', this.state.mobile);
       formData.append('pic', this.state.pic);
-      if(this.state.imageFile !== null) {
-        formData.append('image0',{ uri: this.state.imageFile, type: 'image/jpeg', name: 'user' });
+      if(this.state.pic !== null) {
+        formData.append('image0',{ uri: this.state.pic, type: 'image/jpeg', name: 'user' });
       }
       const response = await axios.post('https://mycampusdock.com/auth/new-user', formData, {
         headers: {
@@ -66,12 +65,13 @@ class CreateProfileScreen extends Component {
       if(response.data.error){
         console.log('Something went wrong');
       } else {
+        console.log(response);
         this.update(JSON.stringify(response.data));
         this.handleSubscription();
         const actionToDispatch = StackActions.reset({
           index: 0,
           key: null,
-          actions: [NavigationActions.navigate({ routeName: 'Main' })],
+          actions: [NavigationActions.navigate({ routeName: 'InterestSelectionScreen' })],
         });
         this.setState({loading : false});
         this.props.navigation.dispatch(actionToDispatch);
@@ -88,8 +88,8 @@ class CreateProfileScreen extends Component {
   }
 
   update = async (data) =>{
-    await AsyncStorage.setItem('data', ''+data);
-    console.log('Data updated : ', data);
+    await AsyncStorage.setItem('data', JSON.stringify(data));
+    await AsyncStorage.setItem('interest', '0');
   }
 
   isValidEmail = (email) =>{
@@ -149,7 +149,7 @@ class CreateProfileScreen extends Component {
       }
       else {
         this.setState({
-          imageFile: response.uri
+          pic : response.uri
         });
       }
     });
@@ -192,7 +192,7 @@ class CreateProfileScreen extends Component {
               <View style={{justifyContent : 'center', backgroundColor : '#fff', borderRadius:8, marginTop:5, marginRight : 15, marginLeft : 15}}>
                 <TouchableOpacity onPress={this.handlePicUpload}>  
                   <View>
-                    <Image style={{marginTop:10, width : 90, height : 90, borderRadius : 45, alignSelf:'center'}} source={{uri: this.state.imageFile === null ?  this.state.pic : this.state.imageFile}} />
+                    <Image style={{marginTop:10, width : 90, height : 90, borderRadius : 45, alignSelf:'center'}} source={{uri: this.state.pic}} />
                     <Text style={{marginBottom : 5, textAlign : 'center', color:'rgb(31, 31, 92)', marginTop: 5}} onPress={this.handlePicUpload}>Select Pic</Text>
                   </View>
                 </TouchableOpacity>
@@ -283,12 +283,12 @@ class CreateProfileScreen extends Component {
                   </View>
                 </View>
                 <View style={{ marginBottom : 20, backgroundColor:'transparent',padding : 5}}>
-                  <TouchableOpacity disabled = {this.state.loading} style={{ justifyContent: 'center', alignItems : 'center',  marginTop : 20, padding : 10, }} iconRight onPress={this.handleSubmit}>
-                    <View style={{flexDirection : 'row', backgroundColor: '#fff', borderRadius : 12, padding: 5}}>
-                      <Text style={{color:'black', padding: 5,  fontSize : 20,  textAlign : 'center', textAlignVertical : 'center'}}>
+                  <TouchableOpacity disabled = {this.state.loading} style={{ justifyContent: 'center', alignItems : 'center',  marginTop : 20, padding : 10, }} onPress={this.handleSubmit}>
+                    <View style={{flexDirection : 'row', backgroundColor: '#3f3f76', borderRadius :30, padding: 5}}>
+                      <Text style={{color:'#fff', paddingLeft : 50, paddingRight : 5, padding : 5,  fontSize : 20,  textAlign : 'center', textAlignVertical : 'center'}}>
                         {'Continue '}
                       </Text>
-                      <Icon name="arrow-forward" style= {{ textAlign : 'center', fontSize : 25, color : 'black', padding: 5}}/>
+                      <Icon name="arrow-forward" style= {{ textAlign : 'center', fontSize : 25, color : '#fff', padding: 5, paddingRight : 50}}/>
                     </View>
                   </TouchableOpacity>
                 </View>

@@ -21,6 +21,8 @@ import { createDrawerNavigator, DrawerItems, createMaterialTopTabNavigator } fro
 import MyEvents from './screens/MyEvents';
 import Settings from './screens/Settings';
 import Bookmarks from './screens/Bookmarks';
+import PreviewStory from './screens/PreviewStory';
+import InterestSelectionScreen from './screens/InterestSelectionScreen';
 
 const DrawerComponent = (props) =>(
   <SafeAreaView style={{flex : 1}}>
@@ -153,14 +155,20 @@ const Screens = createStackNavigator({
           tabBarIcon: ({ tintColor }) => IconBottomNav('person', tintColor)
         }
       }
-    },),
+    },{ tabBarOptions : {
+      showLabel : false,
+      activeTintColor : 'rgb(31, 31, 92)',
+      style : {height : 50, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 5}
+    }}),
     navigationOptions: () => ({
-      header: null,
+      header: null
     }),
   },
   EventDetailScreen: { screen: EventDetailScreen },
   CreateProfileScreen : {screen : CreateProfileScreen},
+  InterestSelectionScreen : {screen : InterestSelectionScreen},
   CheckOutEvent : { screen : CheckOutEvent},
+  PreviewStory : { screen : PreviewStory},
   ChannelDetailScreen : { screen :createMaterialTopTabNavigator({
     ChannelActivity : {
       screen : ChannelActivity

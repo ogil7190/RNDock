@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import { View, StatusBar, Text, TouchableOpacity, ActivityIndicator, FlatList, AsyncStorage } from 'react-native';
+import { View, StatusBar, Text, TouchableOpacity, ActivityIndicator, ScrollView, FlatList, AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-ionicons';
 import axios from 'axios';
-import Activity from './components/Activity';
+import Story from './components/Story';
 
 class ChannelDetailScreen extends Component {
   state={
     isRefreshing : false,
-    activities : null,
+    sorted_activities : null,
     email : null,
     token : null,
     channel : '',
@@ -19,7 +19,19 @@ class ChannelDetailScreen extends Component {
     tabBarVisible : false,
   }
 
+  parseDate = (timestamp) =>{
+    var monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    const curent = new Date(timestamp);
+    var date = curent.getDate();
+    var month = curent.getMonth();
+    var year = curent.getFullYear();
+    return date + '-' +monthNames[month] + '-' + year;
+  }
+
   fetch_data = (channel, last_updated) => {
+    console.log(channel);
     this.setState({isRefreshing : true});
     axios.post('https://mycampusdock.com/channels/user/fetch-channel', { channel }, {
       headers: {
@@ -27,6 +39,7 @@ class ChannelDetailScreen extends Component {
         'x-access-token': this.state.token
       }
     }).then( response => {
+      console.log(response);
       if(!response.data.error){
         this.setState({channel : response.data.data });
         if(response.data.data.subscribed){
@@ -50,7 +63,7 @@ class ChannelDetailScreen extends Component {
       }
     }).then( response => {
       if(!response.data.error) {
-        this.setState({activities : response.data.data.reverse()});
+        this.handleResponse(response.data.data.reverse());
       }
     } )
       .catch( err => {
@@ -59,6 +72,22 @@ class ChannelDetailScreen extends Component {
       .then( () => {
         this.setState({ isRefreshing: false });
       });
+  }
+
+  handleResponse = (data) =>{
+    let sorted_activities = {};
+    let t = null;
+    for(var index = 0; index < data.length; index ++){
+      let item = data[index];
+      let current = this.parseDate(item.timestamp);
+      if(current !== t){
+        t = current;
+        sorted_activities[t] = [];
+      }
+      sorted_activities[t].push(item);
+    }
+    console.log(sorted_activities);
+    this.setState({sorted_activities}); 
   }
 
   async UNSAFE_componentWillMount(){
@@ -71,8 +100,7 @@ class ChannelDetailScreen extends Component {
       this.setState({token, email});
     const { navigation } = this.props;
     const item = this.state.item == null ? navigation.getParam('item', {}) : this.state.item;
-    console.log('Activity');
-    if(this.state.activities === null)
+    if(this.state.sorted_activities === null)
       this.fetch_data(item.channel, 'NONE');
   }
 
@@ -108,9 +136,6 @@ class ChannelDetailScreen extends Component {
       }
     }).then( response => {
       console.log(response);
-      var oldActivites = this.state.activities;
-      oldActivites[index].options[key].push(this.state.email);
-      this.setState({activities : oldActivites});
     });
   }
 
@@ -130,13 +155,29 @@ class ChannelDetailScreen extends Component {
               <Icon name = 'albums' style={{margin : 4, color : '#cfcfcf'}}/>
             </TouchableOpacity>
           </View>
-          <View style={{flex : 1}}>
-            <FlatList
-              style={{backgroundColor : 'rgb(250, 250, 250)'}}
-              keyExtractor={(item, index) => index.toString()}
-              data={this.state.activities}
-              renderItem={({item, index}) => <Activity data = {item} email = {this.state.email} onPress={(data)=>this.handlePress(item, data, index)}/>} />
-          </View>
+          <ScrollView style={{flex : 1}}>
+            {
+              Object.entries(this.state.sorted_activities).map((data, index) =>
+                <View  key= {index} style={{backgroundColor : 'rgb(250, 250, 250)'}}>
+                  <View style={{flexDirection : 'row', margin : 10}}>
+                    <View style={{backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, paddingRight : 10, paddingLeft : 10}} >
+                      <Text style={{fontSize : 15, padding : 5, paddingRight : 10, paddingLeft : 10}}>{data[0]}</Text>
+                    </View>
+                    <View style={{flex : 1}}/>
+                    <TouchableOpacity style={{width : 35, backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, justifyContent : 'center'}} onPress={()=>this.props.navigation.navigate('PreviewStory', {item : data[1]})}>
+                      <Text style={{fontSize : 15, textAlign : 'center', paddingLeft : 3}}><Icon name='play' style={{fontSize : 30}} /></Text>
+                    </TouchableOpacity>
+                  </View>
+                  <FlatList
+                    style={{backgroundColor : 'rgb(250, 250, 250)', paddingTop : 10}}
+                    keyExtractor={(item, index) => index.toString()}
+                    data={data[1]}
+                    numColumns = {3}
+                    renderItem={(item)=> <Story data = {item} onPress={()=>this.props.navigation.navigate('PreviewStory', {item : [item]})}/>} /> 
+                </View>
+              )
+            }
+          </ScrollView>
         </View>);
     } else {
       return (
@@ -153,18 +194,12 @@ class ChannelDetailScreen extends Component {
   render() {
     const { navigation } = this.props;
     const item = this.state.item == null ? navigation.getParam('item', {}) : this.state.item;
-    //const {goBack} = this.props.navigation;
     return(
       <View style={{ flex: 1, backgroundColor : '#efefef' }}>
         <StatusBar
           backgroundColor={'transparent'}
           translucent
           barStyle="dark-content"/>
-        {/* <View style={{flexDirection : 'row', backgroundColor : '#fff'}}>
-          <TouchableOpacity onPress = {()=>goBack()} style= {{width : 36, height : 36, marginTop : 20, marginLeft : 5,}}>
-            <Icon name="arrow-back" style={{ color: '#000', fontSize: 30, backgroundColor : '#fff'}}/>
-          </TouchableOpacity>
-        </View> */}
         <View style={{padding : 20, backgroundColor : '#fff'}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
             <FastImage
@@ -195,6 +230,11 @@ class ChannelDetailScreen extends Component {
               <Text style={{fontSize : 15, textAlign : 'center',  margin : 4}}>{this.state.isRefreshing ? 'Loading' : 'Settings'}</Text>
               <Icon name = 'settings' style={{margin : 5, fontSize : 25}}/>
             </TouchableOpacity>
+
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
+              <Icon name = 'more' style={{margin : 5, fontSize : 25}}/>
+            </TouchableOpacity>
+            
           </View>
         </View>
         {this.getHeader()}

@@ -68,20 +68,30 @@ class Login extends Component {
 
   checkuserExists = async ()=>{
     const user = await AsyncStorage.getItem('data');
+    const interest = await AsyncStorage.getItem('interest');
     this.setState({loading : false});
     if(user!= null){
-      const actionToDispatch = StackActions.reset({
-        index: 0,
-        key: null,
-        actions: [NavigationActions.navigate({ routeName: 'Main' })],
-      });
-      this.props.navigation.dispatch(actionToDispatch);
+      if(interest === '0'){
+        const actionToDispatch = StackActions.reset({
+          index: 0,
+          key: null,
+          actions: [NavigationActions.navigate({ routeName: 'InterestSelectionScreen' })],
+        });
+        this.props.navigation.dispatch(actionToDispatch);
+      } else {
+        const actionToDispatch = StackActions.reset({
+          index: 0,
+          key: null,
+          actions: [NavigationActions.navigate({ routeName: 'Main' })],
+        });
+        this.props.navigation.dispatch(actionToDispatch);
+      }
     }
   }
 
   signIn = async (data)=>{
     this.setState({error_text : null});
-    axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then((response) =>{
+    axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then(async (response) =>{
       this.props.login_success(data, response.data.token);
       this.setState({loading : false});
       if(response.data.newUser){
@@ -92,13 +102,24 @@ class Login extends Component {
         });
         this.props.navigation.dispatch(actionToDispatch);
       } else {
-        this.update(JSON.stringify(response.data));
-        const actionToDispatch = StackActions.reset({
-          index: 0,
-          key: null,
-          actions: [NavigationActions.navigate({ routeName: 'Main', })],
-        });
-        this.props.navigation.dispatch(actionToDispatch);
+        await this.update(JSON.stringify(response.data));
+        if(response.data.data.interests === undefined){
+          await AsyncStorage.setItem('interest', '0');
+          const actionToDispatch = StackActions.reset({
+            index: 0,
+            key: null,
+            actions: [NavigationActions.navigate({ routeName: 'InterestSelectionScreen', })],
+          });
+          this.props.navigation.dispatch(actionToDispatch);
+        } else {
+          await AsyncStorage.setItem('interest', '1');
+          const actionToDispatch = StackActions.reset({
+            index: 0,
+            key: null,
+            actions: [NavigationActions.navigate({ routeName: 'Main', })],
+          });
+          this.props.navigation.dispatch(actionToDispatch);
+        }
       }
     }).catch((err)=>{
       console.log(err);
@@ -168,7 +189,7 @@ class Login extends Component {
           translucent
           barStyle="light-content"/>
         <View style={{flex : 3}}>
-          <Text style = {styles.title}>{"It's always about You!"}</Text>
+          <Text style = {styles.title}>{'It\'s always about You!'}</Text>
           <View style={styles.icon_container}>
             <View style={styles.icon}>
               <Icon_student />
@@ -239,10 +260,10 @@ const styles = StyleSheet.create({
   },
   _button : {
     height: 50,
-    borderRadius : 12,
+    borderRadius : 30,
     alignItems : 'center',
     flexDirection : 'row',
-    backgroundColor : 'rgb(31, 31, 92)',
+    backgroundColor : '#3f3f76',
     width : '100%',
   },
   action_container : {

@@ -169,9 +169,7 @@ class ChannelDetailScreen extends Component {
     const { navigation } = this.props;
     const item = this.state.item == null ? navigation.getParam('item', {}) : this.state.item;
     const channel = navigation.getParam('channel', undefined);
-    if( channel === undefined){
-      console.log('nothing');
-    } else {
+    if( channel !== undefined){
       this.fetch_events(channel);
     }
     return(

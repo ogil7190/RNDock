@@ -80,7 +80,6 @@ class BasicDetailsScreen extends Component {
       });
       this.props.isScreenValid(true);
     } else {
-      console.log(this.state.title.length, this.state.description.length, this.state.location.length, this.state.eventDate, this.state.regStart, this.state.regEnd);
       this.props.isScreenValid(false);
     }
   }

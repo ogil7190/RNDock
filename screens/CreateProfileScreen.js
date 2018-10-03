@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {Text, View, Platform, AsyncStorage, Image, ActionSheetIOS, TextInput, StatusBar, Picker, ScrollView, TouchableOpacity} from 'react-native';
+import {Text, View, Platform, AsyncStorage, Image, ActivityIndicator, ActionSheetIOS, TextInput, StatusBar, Picker, ScrollView, TouchableOpacity} from 'react-native';
 import PropTypes from 'prop-types';
 import { AUTH_USER } from '../constants';
 import ImagePicker from 'react-native-image-picker';
@@ -66,7 +66,7 @@ class CreateProfileScreen extends Component {
         console.log('Something went wrong');
       } else {
         console.log(response);
-        this.update(JSON.stringify(response.data));
+        await this.update(JSON.stringify(response.data));
         this.handleSubscription();
         const actionToDispatch = StackActions.reset({
           index: 0,
@@ -88,7 +88,7 @@ class CreateProfileScreen extends Component {
   }
 
   update = async (data) =>{
-    await AsyncStorage.setItem('data', JSON.stringify(data));
+    await AsyncStorage.setItem('data', data);
     await AsyncStorage.setItem('interest', '0');
   }
 
@@ -176,6 +176,7 @@ class CreateProfileScreen extends Component {
           backgroundColor={'transparent'}
           translucent
           barStyle="light-content"/>
+
         <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, flex : 1}}>
           <ScrollView
             scrollEventThrottle={5}>
@@ -183,7 +184,7 @@ class CreateProfileScreen extends Component {
               <View style={{ marginTop:10, marginBottom:10, marginLeft:15, marginRight:15, overflow: 'hidden' }}>
                 <View style={{ backgroundColor: 'transparent', flex: 1}}>
                   <Text
-                    style={{borderColor : '#fff', color : '#fff', fontSize : 18, fontWeight : '100',  textAlign : 'center'}}>
+                    style={{borderColor : '#fff', color : '#fff', fontSize : 20, fontWeight : '200',  textAlign : 'center'}}>
                       Update Your Profile
                   </Text>  
                 </View>
@@ -202,8 +203,8 @@ class CreateProfileScreen extends Component {
                 <Icon style={{ paddingLeft: 20, padding:8, color : this.state.name_check ? '#f00' : '#000'}} name="person" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
-                    style={{paddingLeft : 10,textAlignVertical : 'center', fontSize : 18}}
-                    maxLength={50}
+                    style={{paddingLeft : 10,textAlignVertical : 'center', fontSize : 18, flex : 1}}
+                    maxLength={15}
                     returnKeyType = "next"
                     placeholder="Your Full Name"
                     value={this.state.name}
@@ -217,7 +218,7 @@ class CreateProfileScreen extends Component {
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
                     editable = {false}
-                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18}}
+                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18, color : '#aaaaaa'}}
                     maxLength={50}
                     placeholder="Your E-mail"
                     returnKeyType = "next"
@@ -231,7 +232,7 @@ class CreateProfileScreen extends Component {
                 <Icon style={{ paddingLeft: 20, padding: 8, color : this.state.mobile_check ? '#f00' : '#000' }} name="call" />
                 <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
                   <TextInput
-                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18}}
+                    style={{paddingLeft : 10, textAlignVertical : 'center', fontSize : 18, flex : 1}}
                     maxLength={10}
                     placeholder="Your Mobile"
                     keyboardType = "phone-pad"
@@ -245,7 +246,7 @@ class CreateProfileScreen extends Component {
 
               <View style={{ backgroundColor: '#fff', marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', alignItems : 'center'}}>
                 <Icon style={{ paddingLeft: 20, padding: 8, color : this.state.college_check ? '#f00' : '#000' }} name="school" />
-                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', padding : 8}}>
+                <View style={{ backgroundColor: 'transparent', flex: 1, alignSelf:'center', justifyContent : 'center', padding : 8}}>
                   {Platform.OS === 'android' ? <Picker
                     mode="dropdown"
                     placeholder="Select College"
@@ -259,7 +260,7 @@ class CreateProfileScreen extends Component {
                     }
                   </Picker> :
                     <Text
-                      style={{paddingLeft : 10, textAlignVertical : 'center', color : '#000', fontSize : 18}}
+                      style={{paddingLeft : 10, textAlignVertical : 'center', color : '#000', fontSize : 18, flex : 1}}
                       onPress = {this.collegeAction}
                       numberOfLines = {1}
                       ellipsizeMode = "tail">{this.state.college}</Text>
@@ -267,21 +268,22 @@ class CreateProfileScreen extends Component {
                 </View>
               </View>
 
-              <View style={{ backgroundColor:'transparent', flex : 1, }}>
+              <View style={{ backgroundColor:'transparent', flex : 1}}>
                 <View style={{flexDirection : 'row'}}>
                   <View style={{ backgroundColor: '#fff', flex : 1, marginTop:10, marginBottom:5, marginLeft:15, marginRight:15, borderRadius: 8, overflow: 'hidden', flexDirection : 'row', justifyContent: 'center'}}>
-                    <View style={{ justifyContent: 'center', flex : 1, padding : 5 }}>
+                    <View style={{ justifyContent: 'center', flex : 1, padding : 10 }}>
                       <Icon name="male" style={{ textAlign: 'center', fontSize: 36, }} />
                       <Text style={{ textAlign: 'center'}}>Male</Text>
                       <Icon name={ this.state.gender === 'M' ? 'radio-button-on' : 'radio-button-off' } style={{ textAlign: 'center', }} onPress={ () => this.setState({ gender: 'M' }) } />
                     </View>
-                    <View style={{justifyContent: 'center', flex:1, padding : 5 }}>
+                    <View style={{justifyContent: 'center', flex:1, padding : 10 }}>
                       <Icon name="female" style={{ textAlign: 'center', fontSize: 36,  }} />
                       <Text style={{ textAlign: 'center'}}>Female</Text>
                       <Icon name={ this.state.gender === 'F' ? 'radio-button-on' : 'radio-button-off' } style={{ textAlign: 'center', }} onPress={ () => this.setState({ gender: 'F' }) } />
                     </View>
                   </View>
                 </View>
+                <ActivityIndicator size="small" color="#fff" animating={this.state.loading}/>
                 <View style={{ marginBottom : 20, backgroundColor:'transparent',padding : 5}}>
                   <TouchableOpacity disabled = {this.state.loading} style={{ justifyContent: 'center', alignItems : 'center',  marginTop : 20, padding : 10, }} onPress={this.handleSubmit}>
                     <View style={{flexDirection : 'row', backgroundColor: '#3f3f76', borderRadius :30, padding: 5}}>

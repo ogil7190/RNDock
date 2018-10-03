@@ -21,8 +21,9 @@ import { createDrawerNavigator, DrawerItems, createMaterialTopTabNavigator } fro
 import MyEvents from './screens/MyEvents';
 import Settings from './screens/Settings';
 import Bookmarks from './screens/Bookmarks';
-import PreviewStory from './screens/PreviewStory';
+import StoryPreview from './screens/StoryPreview';
 import InterestSelectionScreen from './screens/InterestSelectionScreen';
+import ChannelDetailScreen from './screens/ChannelDetailScreen';
 
 const DrawerComponent = (props) =>(
   <SafeAreaView style={{flex : 1}}>
@@ -168,19 +169,20 @@ const Screens = createStackNavigator({
   CreateProfileScreen : {screen : CreateProfileScreen},
   InterestSelectionScreen : {screen : InterestSelectionScreen},
   CheckOutEvent : { screen : CheckOutEvent},
-  PreviewStory : { screen : PreviewStory},
-  ChannelDetailScreen : { screen :createMaterialTopTabNavigator({
-    ChannelActivity : {
-      screen : ChannelActivity
-    },
-    ChannelEvents : {
-      screen : ChannelEvents
-    }
-  }, {
-    swipeEnabled : false,
-    animationEnabled : false,
-    optimizationsEnabled : true,
-  })}
+  StoryPreview : { screen : StoryPreview},
+  // ChannelDetailScreen : { screen :createMaterialTopTabNavigator({
+  //   ChannelActivity : {
+  //     screen : ChannelActivity
+  //   },
+  //   ChannelEvents : {
+  //     screen : ChannelEvents
+  //   }
+  // }, {
+  //   swipeEnabled : false,
+  //   animationEnabled : false,
+  //   optimizationsEnabled : true,
+  // })}
+  ChannelDetailScreen : { screen : ChannelDetailScreen},
 });
 
 export default class App extends Component {

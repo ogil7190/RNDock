@@ -59,6 +59,7 @@ class InterestSelectionScreen extends Component {
           'x-access-token': token
         }
       });
+      console.log(response);
       if(!response.error){
         await this.saveInterests();
         const actionToDispatch = StackActions.reset({
@@ -77,8 +78,7 @@ class InterestSelectionScreen extends Component {
     await AsyncStorage.setItem('interest', '1');
     const str = await AsyncStorage.getItem('data');
     let data = JSON.parse(str);
-    console.log(data);
-    data.data['interests'] = this.state.interests;
+    data.data.interests = this.state.interests;
     await AsyncStorage.setItem('data', JSON.stringify(data));
   }
 

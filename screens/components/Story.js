@@ -14,7 +14,6 @@ class Story extends Component {
   }
 
   getPostType = (item) =>{
-    item.message = 'New video upcoming, tomorrow evening! Hell Yeah! About me huh! Lets get started boy! #GET_SHIT_DONE';
     let size = item.message.split(' ').length / 2;
     return(
       <LinearGradient colors={['rgb(224, 62, 99)', 'rgb(224, 62, 99)', 'rgb(240, 120, 57)']}  style={{backgroundColor : 'red', flex : 1, justifyContent : 'center', alignItems : 'center', borderRadius : 5}}>
@@ -28,7 +27,7 @@ class Story extends Component {
       <FastImage
         style={{flex : 1, borderRadius : 5}}
         source={{
-          uri : 'https://mycampusdock.com/' + item.media[0],
+          uri : 'https://mycampusdock.com/' + item.media,
         }}
         resizeMode={FastImage.resizeMode.cover}
       />

@@ -158,7 +158,6 @@ class CreateEventScreen extends Component {
   }
 
   showToast(text){
-    console.log('Toast', Toast);
     Toast.show({
       text: text,
       buttonText: 'Okay'

@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import {Platform, View, Image, StatusBar, TouchableOpacity, Text, AsyncStorage, ScrollView} from 'react-native';
+import {Platform, View, Image, StatusBar, TouchableOpacity, Text, AsyncStorage} from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-ionicons';
+import Realm from '../realmdb';
 
 class ProfileScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user  : '',
+      user  : 'null',
       loaded : false,
       isRefreshing : false
     };
@@ -22,18 +23,19 @@ class ProfileScreen extends Component {
   async componentDidMount(){
     const str = await AsyncStorage.getItem('data');
     const data = JSON.parse(str);
-    console.log(data);
-    if(this.state.user === ''){
+    if(this.state.user === 'null'){
       this.setState({user : data.data, loaded : true});
     }
   }
 
-  unsaveUser = async ()=>{
-    try {
-      await AsyncStorage.clear();
-    } catch (error) {
-      console.log(error);
-    }
+  unsaveUser = ()=>{
+    Realm.getRealm((realm)=>{
+      realm.write(async () => {
+        realm.deleteAll();
+        await AsyncStorage.clear();
+        this.props.navigation.navigate('Login', {});
+      });
+    });
   }
 
   getRandom = () =>{
@@ -41,7 +43,6 @@ class ProfileScreen extends Component {
   }
 
   render() {
-    console.log(this.state.user);
     return(
       <View style={{ flex: 1, backgroundColor : '#efefef' }}>
         <StatusBar
@@ -54,7 +55,7 @@ class ProfileScreen extends Component {
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity onPress={()=>this.unsaveUser()}>
+            <TouchableOpacity>
               <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
@@ -64,7 +65,7 @@ class ProfileScreen extends Component {
             <FastImage
               style={{height: 72, width: 72, borderRadius : 40,}}
               source={{
-                uri : this.state.loaded ? 'https://mycampusdock.com/' + this.state.user.media[0] : '',
+                uri : this.state.loaded ? 'https://mycampusdock.com/' + this.state.user.media[0] : 'null',
                 priority : FastImage.priority.high
               }}
               resizeMode={FastImage.resizeMode.cover}
@@ -94,6 +95,11 @@ class ProfileScreen extends Component {
               <Icon name = 'more' style={{margin : 5, fontSize : 25}}/>
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={{flex : 1, justifyContent : 'center', alignItems : 'center'}}>
+          <TouchableOpacity onPress={()=>this.unsaveUser()} style={{backgroundColor : 'rgb(0,100, 0)', padding : 5, borderRadius : 10}}>
+            <Text style={{color : '#fff', fontSize : 18}}>LOGOUT</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );

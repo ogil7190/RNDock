@@ -42,7 +42,7 @@ class Login extends Component {
     const configPlatform = {
       ...Platform.select({
         ios: {
-          iosClientId: '7449865696-ae0o9lcpdto2iq2jmq1dt52l9q3pikdp.apps.googleusercontent.com',
+          iosClientId: '7449865696-f0gevigpsirhflrihhvvhh1h18st6ujg.apps.googleusercontent.com',
         },
         android: {},
       }),
@@ -91,7 +91,7 @@ class Login extends Component {
 
   signIn = async (data)=>{
     this.setState({error_text : null});
-    axios.post('https://mycampusdock.com/auth/signin', {email : data.email}).then(async (response) =>{
+    axios.post('https://mycampusdock.com/auth/signin', {email : data.email, token : data.idToken}).then(async (response) =>{
       this.props.login_success(data, response.data.token);
       this.setState({loading : false});
       if(response.data.newUser){
@@ -128,7 +128,6 @@ class Login extends Component {
   }
 
   update = async (data) =>{
-    console.log('Data updated : ', data);
     await AsyncStorage.setItem('data', data);
   }
 
@@ -152,7 +151,6 @@ class Login extends Component {
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
       this.setState({ user: null });
-      console.log('Logged out!');
     } catch (error) {
       this.setState({
         error,

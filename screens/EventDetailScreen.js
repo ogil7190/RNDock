@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { Text, Animated, ScrollView, AsyncStorage, View, StatusBar,TouchableOpacity } from 'react-native';
+import { Text, Animated, ScrollView, AsyncStorage, View, StatusBar,TouchableOpacity, Clipboard} from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
 import { Transition } from 'react-navigation-fluid-transitions';
 import Icon from 'react-native-ionicons';
 import axios from 'axios';
 import Realm from '../realmdb';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 const HEADER_MAX_HEIGHT = 300;
 const HEADER_MIN_HEIGHT = 70;
 
 class EventDetailScreen extends Component {
+
+  toast = '';
 
   static navigationOptions = {
     header: null
@@ -21,7 +24,9 @@ class EventDetailScreen extends Component {
     active : false,
     remTime : null,
     item : null,
-    isRefreshing : false
+    loading : true,
+    avilable : false,
+    error : ''
   }
 
   parseDate = (timestamp) =>{
@@ -36,12 +41,13 @@ class EventDetailScreen extends Component {
   }
 
   componentDidMount(){
+    if(this.state.item == null)
+      this.fetch_event();
     if(this.state.remTime == null){
       const item = this.props.navigation.getParam('item', {});
       const regstart= new Date(item.reg_start);
       const regend= new Date(item.reg_end);
       const current = new Date();
-      console.log(regstart.getTime(), regend.getTime(), current.getTime());
       if(current.getTime() < regstart.getTime()){
         this.setState(() => {
           return { remTime : regstart.getTime() - current.getTime(),  };
@@ -57,8 +63,6 @@ class EventDetailScreen extends Component {
       }
       this.getStatus();
     }
-    if(this.state.item == null)
-      this.fetch_event();
   }
 
   process_realm_obj = (RealmObject, callback) => {
@@ -73,10 +77,9 @@ class EventDetailScreen extends Component {
     const data = JSON.parse(str);
     const token = data.token;
     if( token === null) return;
-    this.setState({ token });
+    this.setState({ token, loading : true});
     const { navigation } = this.props;
     const item = navigation.getParam('item', {});
-
     axios.post('https://mycampusdock.com/events/user/fetch-event-data', { _id : item._id}, {
       headers: {
         'Content-Type': 'application/json',
@@ -88,7 +91,6 @@ class EventDetailScreen extends Component {
           el.audience = JSON.stringify(el.audience);
           el.timestamp = new Date(el.timestamp);
           el.date = new Date(el.date);
-          el['enrolled'] = '100'; // 100 for not enrolled
           el.reg_end = new Date(el.reg_end);
           el.reg_start = new Date(el.reg_start);
           el.enrollees = JSON.stringify(el.enrollees);
@@ -103,8 +105,9 @@ class EventDetailScreen extends Component {
           realm.write(() => {
             let i;
             for(i=0;i<data.length;i++) {
+              console.log(data);
               try {
-                realm.create('Events', {_id : data[i]._id, title : data[i].title, description : data[i].description, enrollees : data[i].enrollees, reach : data[i].reach, view : data[i].views}, true);
+                realm.create('Events', {_id : data[i]._id, title : data[i].title, description : data[i].description, enrollees : data[i].enrollees, reach : data[i].reach, views : data[i].views, contact_details : JSON.stringify(data[i].contact_details), faq : data[i].faq}, true);
               } catch(e) {
                 console.log('Realm', e);
               }
@@ -117,7 +120,7 @@ class EventDetailScreen extends Component {
               Object.keys(event[i]).forEach((key)=>{
                 res[key] = event[i][key];
               });
-              this.setState({item : res});
+              this.setState({item : res, loading : false});
               break;
             }
           }
@@ -125,10 +128,12 @@ class EventDetailScreen extends Component {
       }
     }).catch( err => {
       console.log(err);
-    })
-      .then( () => {
-        this.setState({ isRefreshing: false });
-      });
+    });
+  }
+
+  handleNumber = (data) => {
+    Clipboard.setString(data);
+    this.toast.show('Copied to clipboard!', DURATION.LENGTH_SHORT);
   }
 
   parseTime = (timestamp) =>{
@@ -260,7 +265,7 @@ class EventDetailScreen extends Component {
               right : 5,
             }}>
             <TouchableOpacity onPress = {()=>console.log('heart')} style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}}>
-              <Icon name = {'heart'} style={{ fontSize: 30, color : '#f55'}}/>
+              <Icon name = {'heart'} style={{ fontSize: 30, color : 'red'}}/>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -297,8 +302,8 @@ class EventDetailScreen extends Component {
               </View>
             </View>
           </View>
-          <Text style={{fontSize : 16, margin:15}}>{item.description}</Text>
-          <View style={{ padding : 15, backgroundColor : '#efefef'}}>
+          <Text style={{fontSize : 16, margin:15}}>{item.description}</Text>  
+          <View style={{ margin:15, padding : 5, backgroundColor : '#efefef', borderRadius : 12 }}>
             <View style={{ marginTop: 10 }}>
               <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                 <Icon name='pulse' style={{ marginLeft: 10, marginRight: 10, fontSize:25 }}/>
@@ -318,10 +323,29 @@ class EventDetailScreen extends Component {
               </View>
             </View>
           </View>
-          
-          <View style ={{flex : 1, backgroundColor : '#efefef', justifyContent : 'center', paddingTop: 10, marginBottom:10}}>
+          <View style={{ margin:15, padding : 5, backgroundColor : '#efefef', borderRadius : 12 }}>
+            <View style={{ marginTop: 10 }}>
+              <View style={{ flex: 1, alignItems: 'center', flexDirection : 'row',margin : 5}}>
+                <Text style={{fontSize :16, fontWeight : 'bold'}}>{'FAQ\'s'}</Text>
+                <Icon name='help-circle-outline' style={{ marginLeft: 10, marginRight: 10, fontSize:25 }}/>
+              </View>
+              <Text style={{fontSize :15, marginLeft : 10, marginRight : 10}}>{item.faq === '' ? 'NO FAQ PROVIDED' : item.faq}</Text>
+              {
+                Object.entries(JSON.parse(JSON.parse(item.contact_details))).map((data, index)=>
+                  data[0] === '' ? <View key={index}/> : <View style={{ marginTop: 10 }} key={index}>
+                    <Text style={{fontSize :16, fontWeight : 'bold', marginBottom : 10, marginRight : 10}}>{'Contact'}</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' , marginLeft : 10, marginRight : 10 }}>
+                      <Text style={{fontSize :15}}>{data[0]} : </Text>
+                      <Text style={{fontSize :15, textDecorationLine : 'underline'}} selectable={true} onPress={()=>this.handleNumber(data[1])}>{data[1]}</Text>
+                    </View>
+                  </View>
+                )
+              }
+            </View>
+          </View>
+          <View style={{ margin:15, padding : 5, backgroundColor : '#efefef', borderRadius : 12 }}>
             <FastImage
-              style= {{width : 56, height : 56, borderRadius : 12, margin:5, alignSelf : 'center'}}
+              style= {{width : 56, height : 56, borderRadius : 12, margin:5, marginTop : 10, alignSelf : 'center'}}
               source={{
                 uri : 'https://mycampusdock.com/' + (''+item.channel).trim().split(' ').join('_') +'/logo.webp',
                 priority: FastImage.priority.high,
@@ -329,12 +353,13 @@ class EventDetailScreen extends Component {
               resizeMode={FastImage.resizeMode.cover}/>
             <Text style={{color : 'rgb(31, 31, 92)', fontSize :22, alignSelf : 'center'}}>{'Event by '+ (''+item.channel).toUpperCase()}</Text>
             <Text style={{color : '#a5a5a5', fontSize :15, alignSelf : 'center'}}>{this.state.remTime === 0 ? 'Tap to enroll for this event' : this.state.remTime > 0 ? 'Registration will start in ' + this.parseRem(this.state.remTime) : 'Event Registration are Closed!'}</Text>
-            <TouchableOpacity style={{backgroundColor : this.state.active ? 'rgb(31, 31, 92)' : '#c5c5c5', borderRadius : 15, marginTop:10, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=> this.state.active ? this.props.navigation.navigate('CheckOutEvent', {item}) : console.log('Ohh Fuck!')}>
-              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5}}>{this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
+            <TouchableOpacity style={{backgroundColor : this.state.loading ? '#a5a5a5' : this.state.active ? 'rgb(31, 31, 92)' : '#c5c5c5', borderRadius : 30, marginTop:10, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=> this.state.loading ? console.log('loading') : this.state.active ? this.props.navigation.navigate('CheckOutEvent', {item}) : console.log('NA')}>
+              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 10, paddingLeft : 10}}>{ this.state.loading ? 'LOADING' : this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
             </TouchableOpacity>
             <Text style={{color : '#a5a5a5', fontSize :10, alignSelf : 'center', marginBottom:10, padding:5}}>Easy In-app Purchase</Text>
           </View>
         </ScrollView>
+        <Toast ref={refs => this.toast = refs} opacity={0.7} style={{backgroundColor : 'red'}}/>
       </View>
     );
   }

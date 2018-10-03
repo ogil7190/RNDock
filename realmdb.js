@@ -29,7 +29,7 @@ const Events = {
     timestamp: 'date',
     title: 'string',
     views: 'string',
-    _id:  'string',
+    _id:  'string'
   }
 };
 
@@ -44,18 +44,34 @@ const Activity = {
     name: 'string',
     options: 'string',
     reach: 'string',
+    media: 'string',
     timestamp: 'date',
     type: 'string',
+    poll_type : 'string',
     answered: 'string',
     views: 'string',
-    _id:  'string',
+    _id:  'string'
+  }
+};
+
+const Channel = {
+  name: 'Channel',
+  primaryKey: '_id',
+  properties: {
+    name: 'string',
+    description: 'string',
+    category: 'string',
+    followers: 'string',
+    media: 'string',
+    _id: 'string',
+    followed : 'string',
   }
 };
 
 export default {
   getRealm: (callback) => { 
     if(realmdb === null) {
-      return Realm.open({schema: [Events], deleteRealmIfMigrationNeeded: true })
+      return Realm.open({schema: [Events, Activity, Channel], deleteRealmIfMigrationNeeded: true })
         .then(realm => {
           realmdb = realm;
           callback(realmdb);
@@ -65,3 +81,9 @@ export default {
     }
   }
 };
+
+/* 
+  TERMS OF USAGE
+  * PLEASE DON'T ADD ANY FIELD TO SCHEMA AS IT WILL LEAD TO MIGRATION AND APP WILL DELETE THE SCHEMA.
+  * IF ADDING FILED IS REQUIRED ON OTA, PLEASE LOGOUT THE USER AND DELETE THE SCEHMA THEN.
+*/

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Text, View, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, TouchableWithoutFeedback, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
-import Icon from 'react-native-ionicons';
 
 class FlatCard extends Component {
   constructor(props){
     super(props);
     this.state = {
       card : '',
+      isSpecial : false
     };
   }
 
@@ -37,7 +37,7 @@ class FlatCard extends Component {
     return hours + ':' +mins + ' ' + duration;
   }
 
-  render() {    
+  render() {
     return (
       <TouchableWithoutFeedback onPress={ () => this.props.onPress(this.props.data, this.card)}>
         <View ref={(viewRef) => this.card = viewRef} style = {{height : 400,  marginBottom : 15, shadowOpacity : 0.4, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:15}}>
@@ -71,6 +71,7 @@ class FlatCard extends Component {
                   </Text>
                 </View>
               </View>
+              { this.state.isSpecial ? <Image source={require('../images/ribbon.png')} style={{position : 'absolute', right : 0, top : 0, width : 56, height : 56}} />  : <View/>}
             </View>
           </View>
         </View>

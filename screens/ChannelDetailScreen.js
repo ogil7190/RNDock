@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StatusBar, Text, TouchableOpacity, Alert, ActivityIndicator, ScrollView, FlatList, AsyncStorage } from 'react-native';
+import { View, StatusBar, Text, TouchableOpacity, Alert, Platform, ActivityIndicator, ScrollView, FlatList, AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-ionicons';
@@ -16,8 +16,8 @@ class ChannelDetailScreen extends Component {
   }
 
   static navigationOptions = {
-    tabBarVisible : false,
-  }
+    header: null,
+  };
 
   parseDate = (timestamp) =>{
     var monthNames = [
@@ -36,17 +36,19 @@ class ChannelDetailScreen extends Component {
         'Content-Type': 'application/json',
         'x-access-token': this.state.token
       }
-    }).then( response => {
+    }).then(response => {
       if(!response.data.error){
         response.data.data.media = JSON.stringify(response.data.data.media);
         response.data.data.followers = ''+response.data.data.followers;
         response.data.data.followed = ''+response.data.data.followed;
         let channel = response.data.data;
+        console.log('Fetched Channel : ', channel);
+
         Realm.getRealm((realm) => {
-          this.setState({channel});
           realm.write(() => {
             realm.create('Channel', channel, true);
           });
+
           if(JSON.parse(channel.followed)){
             let OldRecords = realm.objects('Activity').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
             let last_updated;
@@ -55,24 +57,28 @@ class ChannelDetailScreen extends Component {
             } catch(e) {
               last_updated = 'NONE';
             }
-            this.fetch_activity(last_updated, channel_id, (data)=>{
-              this.handleResponse(data);
-              if(data.length === 0) return;
+            this.fetch_activity(last_updated, channel_id, (activities)=>{
+              if(activities.length === 0) return;
               realm.write(() => {
                 let i;
-                for(i=0;i<data.length;i++) {
+                for(i=0;i<activities.length;i++) {
                   try {
-                    realm.create('Activity', data[i]);
+                    realm.create('Activity', activities[i], true);
                   } catch(e) {
                     console.log(e);
                   }
                 }
+                this.setChannel(channel_id, (exists)=>{
+                  console.log(exists);
+                });
               });
             });
-            this.setState({ isRefreshing: false });
           }
-          else {
+          if(this.state.isRefreshing){
             this.setState({ isRefreshing: false });
+            this.setChannel(channel_id, (exists)=>{
+              console.log(exists);
+            });
           }
         });
       }
@@ -120,13 +126,7 @@ class ChannelDetailScreen extends Component {
       }
       sorted_activities[t].push(item);
     }
-    if(Object.keys(sorted_activities).length > 0){
-      this.setState({sorted_activities});
-    }
-
-    if(this.state.sorted_activities === null){
-      this.setState({sorted_activities : []});
-    }
+    return sorted_activities;
   }
 
   process_realm_obj = (RealmObject, callback) => {
@@ -143,22 +143,31 @@ class ChannelDetailScreen extends Component {
     if( token === null) return;
     if(this.state.token == null)
       this.setState({token});
+    
     const { navigation } = this.props;
-    const channel_id = this.state.item == null ? navigation.getParam('channel_id', {}) : this.state.item;
+    const channel_id = navigation.getParam('channel_id', {});
+    this.setChannel(channel_id, (exists)=>{
+      if(!exists){
+        this.setState({isRefreshing : true});
+      }
+      this.fetch_data(channel_id);
+    });
+  }
+
+  setChannel = (channel_id, callback) =>{
     Realm.getRealm((realm) => {
       let channels = realm.objects('Channel').filtered('_id = "' + channel_id + '"');
-      this.process_realm_obj(channels, (result) => {
-        console.log('stored', result);
-        if(result.length > 0){
-          this.setState({channel : result[0]});
-        } else {
-          this.setState({isRefreshing : true});
+      this.process_realm_obj(channels, (channels) => {
+        console.log('Got Channel', channels);
+        if(channels.length > 0){
+          let Activity = realm.objects('Activity').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
+          this.process_realm_obj(Activity, (activities) => {
+            let sorted_activities = this.handleResponse(activities);
+            this.setState({channel : channels[0], sorted_activities}, ()=>callback(true));
+          });
+        } else{
+          callback(false);
         }
-      });
-      let Activity = realm.objects('Activity').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
-      this.process_realm_obj(Activity, (result) => {
-        this.handleResponse(result);
-        this.fetch_data(channel_id);
       });
     });
   }
@@ -172,6 +181,7 @@ class ChannelDetailScreen extends Component {
   }
 
   unfollow = () =>{
+    this.setState({isRefreshing : true});
     axios.post('https://mycampusdock.com/channels/user/unfollow', {channel_id : this.state.channel._id}, {
       headers: {
         'Content-Type': 'application/json',
@@ -179,13 +189,14 @@ class ChannelDetailScreen extends Component {
       }
     }).then( response => {
       if(!response.error)
-        this.fetch_data(this.state.channel._id, 'NONE');
+        this.fetch_data(this.state.channel._id);
     }).catch(e =>{
       console.log('error', e);
     });
   }
 
   follow = () =>{
+    this.setState({isRefreshing : true});
     axios.post('https://mycampusdock.com/channels/user/follow', {channel_id : this.state.channel._id}, {
       headers: {
         'Content-Type': 'application/json',
@@ -193,7 +204,7 @@ class ChannelDetailScreen extends Component {
       }
     }).then( response => {
       if(!response.error)
-        this.fetch_data(this.state.channel._id, 'NONE');
+        this.fetch_data(this.state.channel._id);
     }).catch(e =>{
       console.log('error', e);
     });
@@ -232,7 +243,6 @@ class ChannelDetailScreen extends Component {
   }
 
   getMini = () =>{
-    console.log(this.state.sorted_activities);
     return(
       <View style={{flex : 1}}>
         <View style={{backgroundColor : '#fff', flexDirection : 'row', borderWidth : 0.5, borderColor : '#cfcfcf'}}>
@@ -290,12 +300,21 @@ class ChannelDetailScreen extends Component {
 
   
   render() {
+    const {goBack} = this.props.navigation;
     return(
       <View style={{ flex: 1, backgroundColor : '#efefef' }}>
         <StatusBar
           backgroundColor={'transparent'}
           translucent
           barStyle="dark-content"/>
+        <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, justifyContent : 'center', alignItems : 'center'}}>
+          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
+            <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 15}}>
+              <Icon name="arrow-back" style={{ color: 'red', fontSize: 30, textAlign : 'center'}}/>
+            </TouchableOpacity>
+            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', alignContent : 'center'}}>{'Channel'}</Text>
+          </View>
+        </View>
         <View style={{padding : 20, backgroundColor : '#fff'}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
             <FastImage

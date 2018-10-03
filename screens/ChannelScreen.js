@@ -28,14 +28,6 @@ class ChannelScreen extends Component {
     }
   }
 
-  UNSAFE_componentWillMount(){
-    console.log('Mounted');
-  }
-
-  componentWillUnmount(){
-    console.log('Unmounted');
-  }
-
   process_realm_obj = (RealmObject, callback) => {
     var result = Object.keys(RealmObject).map(function(key) {
       return {...RealmObject[key]};
@@ -64,14 +56,6 @@ class ChannelScreen extends Component {
       await this.update_event_list();
     } catch(Exception) {
       console.log(Exception);
-    }
-  }
-
-  unsaveUser = async ()=>{
-    try {
-      await AsyncStorage.clear();
-    } catch (error) {
-      console.log(error);
     }
   }
 
@@ -136,7 +120,6 @@ class ChannelScreen extends Component {
 
       let Events = realm.objects('Events').sorted('timestamp');
       process_realm_obj(Events, (result) => {
-        console.log('Data', result);
         this.setState({ event_list: result.reverse() });
       });  
     });

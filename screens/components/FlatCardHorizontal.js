@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Text, View, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { Text, View, TouchableWithoutFeedback, Dimensions, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
-import Icon from 'react-native-ionicons';
 
 class FlatCard extends Component {
   constructor(props){
     super(props);
     this.state = {
       card : '',
+      isSpecial  : false
     };
   }
 
@@ -72,6 +72,7 @@ class FlatCard extends Component {
                   </Text>
                 </View>
               </View>
+              { this.state.isSpecial ? <Image source={require('../images/ribbon.png')} style={{position : 'absolute', right : 0, top : 0, width : 64, height : 64}} /> : <View/> }
             </View>
           </View>
         </View>

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { ScrollView, Text, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage, FlatList } from 'react-native';
+import { ScrollView, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import FlatCardChannel from './components/FlatCardChannel';
+import CustomList from './components/CustomList';
 import axios from 'axios';
 import Realm from '../realmdb';
 import Icon from 'react-native-ionicons';
 import FlatCard from './components/FlatCard';
-import FlatCardHorizontal from './components/FlatCardHorizontal';
 import FirebaseModule from './FirebaseModule';
 
 class HomeScreen extends Component {
@@ -24,14 +24,6 @@ class HomeScreen extends Component {
     if(flag){
       await this.handleSubscription();
     }
-  }
-
-  UNSAFE_componentWillMount(){
-    console.log('Mounted');
-  }
-
-  componentWillUnmount(){
-    console.log('Unmounted');
   }
 
   process_realm_obj = (RealmObject, callback) => {
@@ -64,9 +56,26 @@ class HomeScreen extends Component {
       if( token === null) return;
       this.setState({ token });
       await this.update_event_list();
+      await this.updateUserDetails();
     } catch(Exception) {
       console.log(Exception);
     }
+  }
+
+  updateUserDetails = async () =>{
+    axios.post('https://mycampusdock.com/auth/fetch-user', {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': this.state.token
+      }
+    }).then(async (response) => {
+      if(!response.data.error){
+        const str = await AsyncStorage.getItem('data');
+        let data = JSON.parse(str);
+        data.data = response.data.data;
+        await AsyncStorage.setItem('data', JSON.stringify(data));
+      }
+    });
   }
 
   fetch_event_data = (token, last_updated, callback) => {
@@ -76,16 +85,18 @@ class HomeScreen extends Component {
         'x-access-token': token
       }
     }).then( response => {
+      console.log(response);
       if(!response.data.error) {
         response.data.data.forEach((el)=>{
           el.audience = JSON.stringify(el.audience);
           el.timestamp = new Date(el.timestamp);
           el.date = new Date(el.date);
-          el['enrolled'] = '100'; // 100 for not enrolled
           el.reg_end = new Date(el.reg_end);
           el.reg_start = new Date(el.reg_start);
+          el.enrolled = '100';
           el.enrollees = JSON.stringify(el.enrollees);
           el.media = JSON.stringify(el.media);
+          el.contact_details = JSON.stringify(el.contact_details);
           el.reach = JSON.stringify(el.reach);
           el.views = JSON.stringify(el.views);
         });
@@ -135,12 +146,12 @@ class HomeScreen extends Component {
     });
   }
 
-  unsaveUser = async ()=>{
-    try {
-      await AsyncStorage.clear();
-    } catch (error) {
-      console.log(error);
-    }
+  getChannelUpdatesData = () =>{
+    const data = [
+      { image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel_id : 'ogil7190', name : 'OGIL7190', data : 'Something', url : 'Something'},
+      { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', name : 'Menime', channel_id : 'menime', data : 'Something', url : 'Something'}
+    ];
+    return data;
   }
 
   render() {
@@ -158,7 +169,7 @@ class HomeScreen extends Component {
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity onPress={()=>this.unsaveUser()}>
+            <TouchableOpacity>
               <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
@@ -170,57 +181,41 @@ class HomeScreen extends Component {
               colors={['rgb(31, 31, 92)']}
               refreshing={this.state.isRefreshing}
               onRefresh={this.update_event_list.bind(this)}
-            />
-          }>
-          <Text style={{fontSize : 18, marginLeft :16, marginTop : 5, marginBottom:5}}>
-            Channel Updates
-            <Text  style={{color : 'red', fontSize : 25}}> • </Text>
-          </Text>
-          <FlatList
-            keyExtractor={(item, index) => index.toString()}
-            data={[{ image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel : 'ogil7190', name : 'OGIL7190', data : 'Something', url : 'Something'},
-              { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', name : 'Menime', channel : 'menime', data : 'Something', url : 'Something'}]}
-            horizontal = {true}
-            showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCardChannel image = {item.image} title = {item.title} channel = {item.channel} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {item, title : item.title})} />}
-          />
-          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
-            All about Today
-            <Text  style={{color : 'red', fontSize : 25}}> • </Text>
-          </Text>
+            /> }>
+
+          <CustomList 
+            title = "Channel Updates" 
+            showTitle = {true}
+            showMark = {true}
+            isHorizontal = {true}
+            data = {this.getChannelUpdatesData()}
+            onRender = {({item})=> <FlatCardChannel image = {item.image} title = {item.title} channel_id = {item.channel_id} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item.channel_id, item : item})} /> }/>
           
-          <FlatList
-            keyExtractor={(item) => item._id}
+          {/* <CustomList
+            title = "All about Today" 
+            showTitle = {true}
+            showMark = {true}
             data={event_list}
-            horizontal = {true}
-            showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
-
-          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
-            From Your Channels
-            <Text  style={{color : 'red', fontSize : 25}}> • </Text>
-          </Text>
+            isHorizontal = {true}
+            onRender={(item) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
           
-          <FlatList
-            keyExtractor={(item) => item._id}
-            data={event_list.slice(2, 5)}
-            horizontal = {true}
-            showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+          <CustomList
+            title = "From Your Channels"
+            data={event_list}
+            showTitle = {true}
+            showMark = {true}
+            isHorizontal = {true}
+            onRender={(item) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/> */}
 
-          <Text style={{fontSize : 18, marginLeft : 16, marginTop : 5, marginBottom : 5}}>
-            Upcoming Events
-            <Text  style={{color : 'red', fontSize : 25}}> • </Text>
-          </Text>
-          
-          <FlatList
-            keyExtractor={(item) => item._id}
-            data={event_list.slice(3,6)}
-            style = {{marginLeft : 15, marginRight : 20}}
-            showsHorizontalScrollIndicator = {false}
-            renderItem={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+          <CustomList
+            title = "Upcoming Events"
+            data={event_list}
+            showTitle = {true}
+            showMark = {true}
+            style={{margin : 10, marginLeft : 20, marginRight : 20}}
+            isHorizontal = {false}
+            onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
         </ScrollView>
-
       </View>
     );
   }

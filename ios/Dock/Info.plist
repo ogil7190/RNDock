@@ -26,10 +26,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.googleusercontent.apps.7449865696-ae0o9lcpdto2iq2jmq1dt52l9q3pikdp</string>
+			<string>com.googleusercontent.apps.7449865696-f0gevigpsirhflrihhvvhh1h18st6ujg</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.7449865696-ae0o9lcpdto2iq2jmq1dt52l9q3pikdp</string>
+				<string>com.googleusercontent.apps.7449865696-f0gevigpsirhflrihhvvhh1h18st6ujg</string>
 			</array>
 		</dict>
 		<dict>
@@ -47,10 +47,6 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -65,7 +61,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Capture a new image</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>App would like to your microphone (for videos)</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -88,6 +84,10 @@
 		<string>rubicon-icon-font.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

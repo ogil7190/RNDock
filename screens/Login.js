@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     borderRadius : 30,
     alignItems : 'center',
     flexDirection : 'row',
-    backgroundColor : '#3f3f76',
+    backgroundColor : 'orange',
     width : '100%',
   },
   action_container : {

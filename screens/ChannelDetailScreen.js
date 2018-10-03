@@ -6,12 +6,15 @@ import Icon from 'react-native-ionicons';
 import axios from 'axios';
 import Realm from '../realmdb';
 import Story from './components/Story';
+import Swiper from 'react-native-swiper';
+import FlatCardList from './components/FlatCardList';
 
 class ChannelDetailScreen extends Component {
   state = {
     isRefreshing : false,
     sorted_activities : null,
     token : null,
+    tab : 0,
     channel : null,
   }
 
@@ -58,7 +61,6 @@ class ChannelDetailScreen extends Component {
               last_updated = 'NONE';
             }
             this.fetch_activity(last_updated, channel_id, (activities)=>{
-              if(activities.length === 0) return;
               realm.write(() => {
                 let i;
                 for(i=0;i<activities.length;i++) {
@@ -68,9 +70,9 @@ class ChannelDetailScreen extends Component {
                     console.log(e);
                   }
                 }
-                this.setChannel(channel_id, (exists)=>{
-                  console.log(exists);
-                });
+              });
+              this.setChannel(channel_id, (exists)=>{
+                console.log(exists);
               });
             });
           }
@@ -105,7 +107,7 @@ class ChannelDetailScreen extends Component {
           el.poll_type = el.poll_type === undefined ? 'NONE' : el.poll_type;
           el.reach = JSON.stringify(el.reach);
           el.views = JSON.stringify(el.views);
-          el.answered = 'false';
+          el.answered = el.answered === undefined ? '' + false : JSON.stringify(el.answered);
         });
         callback(response.data.data);
       }
@@ -163,7 +165,9 @@ class ChannelDetailScreen extends Component {
           let Activity = realm.objects('Activity').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
           this.process_realm_obj(Activity, (activities) => {
             let sorted_activities = this.handleResponse(activities);
-            this.setState({channel : channels[0], sorted_activities}, ()=>callback(true));
+            this.fetch_events(channel_id, (events)=>{
+              this.setState({channel : channels[0], sorted_activities, events}, ()=>callback(true));
+            });
           });
         } else{
           callback(false);
@@ -242,41 +246,61 @@ class ChannelDetailScreen extends Component {
     });
   }
 
+  fetch_events = (channel_id, callback) =>{
+    Realm.getRealm((realm) => {
+      let events = realm.objects('Events').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
+      this.process_realm_obj(events, (result) =>{
+        callback(result);
+      });
+    });
+  }
+
   getMini = () =>{
     return(
       <View style={{flex : 1}}>
         <View style={{backgroundColor : '#fff', flexDirection : 'row', borderWidth : 0.5, borderColor : '#cfcfcf'}}>
-          <TouchableOpacity style={{flex : 1, flexDirection : 'row',  justifyContent : 'center', alignItems : 'center', margin : 2}}>
-            <Icon name = 'pulse' style={{margin : 4, color : 'rgb(31, 31, 92)'}}/>
+          <TouchableOpacity style={{flex : 1, flexDirection : 'row',  justifyContent : 'center', alignItems : 'center', margin : 2}} onPress={()=>this.setState({tab : 0})}>
+            <Icon name = 'pulse' style={{margin : 4, color : this.state.tab === 0 ? 'rgb(31, 31, 92)' : '#cfcfcf'}}/>
           </TouchableOpacity>
 
-          <TouchableOpacity style={{flex : 1, flexDirection : 'row',  justifyContent : 'center', alignItems : 'center', margin : 2,}} onPress={()=>this.props.navigation.navigate('ChannelEvents', {channel : this.state.channel})}>
-            <Icon name = 'albums' style={{margin : 4, color : '#cfcfcf'}}/>
+          <TouchableOpacity style={{flex : 1, flexDirection : 'row',  justifyContent : 'center', alignItems : 'center', margin : 2,}} onPress={()=>this.setState({tab : 1})}>
+            <Icon name = 'albums' style={{margin : 4, color : this.state.tab === 1 ? 'rgb(31, 31, 92)' : '#cfcfcf'}}/>
           </TouchableOpacity>
         </View>
-        <ScrollView style={{flex : 1}}>
-          {
-            Object.entries(this.state.sorted_activities).map((data, index) =>
-              <View  key= {index} style={{backgroundColor : 'rgb(250, 250, 250)'}}>
-                <View style={{flexDirection : 'row', margin : 10}}>
-                  <View style={{backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, paddingRight : 10, paddingLeft : 10}} >
-                    <Text style={{fontSize : 15, padding : 5, paddingRight : 10, paddingLeft : 10}}>{data[0]}</Text>
+        <Swiper
+          loop={false}
+          scrollEnabled ={false}
+          index={this.state.tab}
+          showsPagination={false}>
+          <ScrollView style={{flex : 1}}>
+            {
+              Object.entries(this.state.sorted_activities).map((data, index) =>
+                <View  key= {index} style={{backgroundColor : 'rgb(250, 250, 250)'}}>
+                  <View style={{flexDirection : 'row', margin : 10}}>
+                    <View style={{backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, paddingRight : 10, paddingLeft : 10}} >
+                      <Text style={{fontSize : 15, padding : 5, paddingRight : 10, paddingLeft : 10}}>{data[0]}</Text>
+                    </View>
+                    <View style={{flex : 1}}/>
+                    <TouchableOpacity style={{width : 35, backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, justifyContent : 'center'}} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : data[1]})}>
+                      <Text style={{fontSize : 15, textAlign : 'center', paddingLeft : 3}}><Icon name='play' style={{fontSize : 30}} /></Text>
+                    </TouchableOpacity>
                   </View>
-                  <View style={{flex : 1}}/>
-                  <TouchableOpacity style={{width : 35, backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, justifyContent : 'center'}} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : data[1]})}>
-                    <Text style={{fontSize : 15, textAlign : 'center', paddingLeft : 3}}><Icon name='play' style={{fontSize : 30}} /></Text>
-                  </TouchableOpacity>
+                  <FlatList
+                    style={{backgroundColor : 'rgb(250, 250, 250)', paddingTop : 10}}
+                    keyExtractor={(item, index) => index.toString()}
+                    data={data[1]}
+                    numColumns = {3}
+                    renderItem={(item)=> <Story data = {item} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : [item]})}/>} /> 
                 </View>
-                <FlatList
-                  style={{backgroundColor : 'rgb(250, 250, 250)', paddingTop : 10}}
-                  keyExtractor={(item, index) => index.toString()}
-                  data={data[1]}
-                  numColumns = {3}
-                  renderItem={(item)=> <Story data = {item} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : [item]})}/>} /> 
-              </View>
-            )
-          }
-        </ScrollView>
+              )
+            }
+          </ScrollView>
+          <FlatList
+            style={{backgroundColor : 'rgb(250, 250, 250)', paddingLeft : 20, paddingRight : 20, paddingTop : 10}}
+            keyExtractor={(item, index) => index.toString()}
+            data={this.state.events}
+            renderItem={({item}) => <FlatCardList image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+        </Swiper>
       </View>);
   }
 
@@ -309,10 +333,10 @@ class ChannelDetailScreen extends Component {
           barStyle="dark-content"/>
         <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, justifyContent : 'center', alignItems : 'center'}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
-            <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 15}}>
+            <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 10}}>
               <Icon name="arrow-back" style={{ color: 'red', fontSize: 30, textAlign : 'center'}}/>
             </TouchableOpacity>
-            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', alignContent : 'center'}}>{'Channel'}</Text>
+            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', paddingRight : 20,  alignContent : 'center'}}>{this.state.channel ? this.state.channel.name : 'Channel'}</Text>
           </View>
         </View>
         <View style={{padding : 20, backgroundColor : '#fff'}}>
@@ -328,7 +352,7 @@ class ChannelDetailScreen extends Component {
             <Text style={{fontSize : 18, textAlign : 'left', textAlignVertical : 'center', marginLeft : 10}}>{this.state.channel ? this.state.channel.name : 'Loading'}</Text>
           </View>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
-            <Text style={{textAlign : 'center'}} numberOfLines = {2} ellipsizeMode = 'tail'>{this.state.channel ? this.state.channel.description : 'Loading...'}</Text>
+            <Text style={{textAlign : 'center'}}>{this.state.channel ? this.state.channel.description : 'Loading...'}</Text>
           </View>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
             <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
@@ -349,7 +373,6 @@ class ChannelDetailScreen extends Component {
             <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
               <Icon name = 'more' style={{margin : 5, fontSize : 25}}/>
             </TouchableOpacity>
-            
           </View>
         </View>
         {this.getContent()} 

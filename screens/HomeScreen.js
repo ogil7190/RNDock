@@ -186,7 +186,7 @@ class HomeScreen extends Component {
           <CustomList 
             title = "Channel Updates" 
             showTitle = {true}
-            showMark = {true}
+            showMark ={true}
             isHorizontal = {true}
             data = {this.getChannelUpdatesData()}
             onRender = {({item})=> <FlatCardChannel image = {item.image} title = {item.title} channel_id = {item.channel_id} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item.channel_id, item : item})} /> }/>
@@ -211,7 +211,6 @@ class HomeScreen extends Component {
             title = "Upcoming Events"
             data={event_list}
             showTitle = {true}
-            showMark = {true}
             style={{margin : 10, marginLeft : 20, marginRight : 20}}
             isHorizontal = {false}
             onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>

@@ -158,7 +158,7 @@ const Screens = createStackNavigator({
       }
     },{ tabBarOptions : {
       showLabel : false,
-      activeTintColor : 'rgb(31, 31, 92)',
+      activeTintColor : 'orange',
       style : {height : 50, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 5}
     }}),
     navigationOptions: () => ({

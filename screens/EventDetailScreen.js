@@ -265,7 +265,7 @@ class EventDetailScreen extends Component {
               right : 5,
             }}>
             <TouchableOpacity onPress = {()=>console.log('heart')} style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}}>
-              <Icon name = {'heart'} style={{ fontSize: 30, color : 'red'}}/>
+              <Icon name = {'heart'} style={{ fontSize: 30, color : 'orange'}}/>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -359,7 +359,7 @@ class EventDetailScreen extends Component {
             <Text style={{color : '#a5a5a5', fontSize :10, alignSelf : 'center', marginBottom:10, padding:5}}>Easy In-app Purchase</Text>
           </View>
         </ScrollView>
-        <Toast ref={refs => this.toast = refs} opacity={0.7} style={{backgroundColor : 'red'}}/>
+        <Toast ref={refs => this.toast = refs} opacity={0.9} style={{backgroundColor : 'orange'}}/>
       </View>
     );
   }

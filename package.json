@@ -7,6 +7,9 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "iphone": "react-native run-ios --device",
+    "iphone-release" : "react-native run-ios --configuration Release --device",
+    "ios-release" : "react-native run-ios --configuration Release",
+    "android-release" : "react-native run-android --variant=release",
     "test": "jest"
   },
   "dependencies": {

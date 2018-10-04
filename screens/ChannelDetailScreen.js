@@ -322,6 +322,11 @@ class ChannelDetailScreen extends Component {
     }
   }
 
+  showUsers = () =>{
+    if(!this.state.isRefreshing && this.state.channel.followers >0){
+      this.props.navigation.navigate('ChannelUsersScreen', {channel : this.state.channel});
+    }
+  }
   
   render() {
     const {goBack} = this.props.navigation;
@@ -339,7 +344,7 @@ class ChannelDetailScreen extends Component {
             <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', paddingRight : 20,  alignContent : 'center'}}>{this.state.channel ? this.state.channel.name : 'Channel'}</Text>
           </View>
         </View>
-        <View style={{padding : 20, backgroundColor : '#fff'}}>
+        <View style={{padding : 20, backgroundColor : '#fff',}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
             <FastImage
               style={{height: 72, width: 72, borderRadius : 40,}}
@@ -355,7 +360,7 @@ class ChannelDetailScreen extends Component {
             <Text style={{textAlign : 'center'}}>{this.state.channel ? this.state.channel.description : 'Loading...'}</Text>
           </View>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
-            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
+            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}} onPress={()=>this.showUsers()}>
               <Text style={{fontSize : 15, textAlign : 'center', margin : 4}}>{this.state.isRefreshing ? 'Loading' : this.state.channel ? this.state.channel.followers === undefined ? 0 : this.state.channel.followers : '...'}</Text>
               <Icon name = 'people' style={{margin : 5, fontSize : 25}}/>
             </TouchableOpacity>

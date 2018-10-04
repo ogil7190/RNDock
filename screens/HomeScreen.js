@@ -188,11 +188,12 @@ class HomeScreen extends Component {
             showTitle = {true}
             showMark ={true}
             isHorizontal = {true}
+            style={{margin : 5, marginLeft : 10, marginRight : 10}}
             data = {this.getChannelUpdatesData()}
             onRender = {({item})=> <FlatCardChannel image = {item.image} title = {item.title} channel_id = {item.channel_id} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item.channel_id, item : item})} /> }/>
           
           {/* <CustomList
-            title = "All about Today" 
+            title = "All about Today"
             showTitle = {true}
             showMark = {true}
             data={event_list}
@@ -211,7 +212,7 @@ class HomeScreen extends Component {
             title = "Upcoming Events"
             data={event_list}
             showTitle = {true}
-            style={{margin : 10, marginLeft : 20, marginRight : 20}}
+            style={{margin : 10, marginLeft : 15, marginRight : 15}}
             isHorizontal = {false}
             onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
         </ScrollView>

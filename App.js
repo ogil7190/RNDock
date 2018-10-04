@@ -15,15 +15,14 @@ import {DeviceEventEmitter, Dimensions, SafeAreaView, View, Image, ScrollView} f
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-ionicons';
 import CheckOutEvent from './screens/CheckOutEvent';
-import ChannelActivity from './screens/ChannelActivity';
-import ChannelEvents from './screens/ChannelEvents';
-import { createDrawerNavigator, DrawerItems, createMaterialTopTabNavigator } from 'react-navigation';
+import { createDrawerNavigator, DrawerItems } from 'react-navigation';
 import MyEvents from './screens/MyEvents';
 import Settings from './screens/Settings';
 import Bookmarks from './screens/Bookmarks';
 import StoryPreview from './screens/StoryPreview';
 import InterestSelectionScreen from './screens/InterestSelectionScreen';
 import ChannelDetailScreen from './screens/ChannelDetailScreen';
+import ChannelUsersScreen from './screens/ChannelUsersScreen';
 
 const DrawerComponent = (props) =>(
   <SafeAreaView style={{flex : 1}}>
@@ -170,19 +169,8 @@ const Screens = createStackNavigator({
   InterestSelectionScreen : {screen : InterestSelectionScreen},
   CheckOutEvent : { screen : CheckOutEvent},
   StoryPreview : { screen : StoryPreview},
-  // ChannelDetailScreen : { screen :createMaterialTopTabNavigator({
-  //   ChannelActivity : {
-  //     screen : ChannelActivity
-  //   },
-  //   ChannelEvents : {
-  //     screen : ChannelEvents
-  //   }
-  // }, {
-  //   swipeEnabled : false,
-  //   animationEnabled : false,
-  //   optimizationsEnabled : true,
-  // })}
   ChannelDetailScreen : { screen : ChannelDetailScreen},
+  ChannelUsersScreen : { screen : ChannelUsersScreen},
 });
 
 export default class App extends Component {

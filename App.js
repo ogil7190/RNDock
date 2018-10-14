@@ -63,7 +63,7 @@ const Nav = createDrawerNavigator({
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});
+});;
 
 const Nav2 = createDrawerNavigator({
   ChannelScreen: {
@@ -93,7 +93,7 @@ const Nav2 = createDrawerNavigator({
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});
+});;
 
 const Nav3 = createDrawerNavigator({
   ProfileScreen: {
@@ -123,7 +123,7 @@ const Nav3 = createDrawerNavigator({
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});
+});;
 
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );

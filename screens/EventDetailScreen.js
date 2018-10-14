@@ -92,6 +92,7 @@ class EventDetailScreen extends Component {
           el.timestamp = new Date(el.timestamp);
           el.date = new Date(el.date);
           el.reg_end = new Date(el.reg_end);
+          el.enrolled = JSON.stringify(el.enrolled);
           el.reg_start = new Date(el.reg_start);
           el.enrollees = JSON.stringify(el.enrollees);
           el.media = JSON.stringify(el.media);
@@ -105,9 +106,8 @@ class EventDetailScreen extends Component {
           realm.write(() => {
             let i;
             for(i=0;i<data.length;i++) {
-              console.log(data);
               try {
-                realm.create('Events', {_id : data[i]._id, title : data[i].title, description : data[i].description, enrollees : data[i].enrollees, reach : data[i].reach, views : data[i].views, contact_details : JSON.stringify(data[i].contact_details), faq : data[i].faq}, true);
+                realm.create('Events', {_id : data[i]._id, title : data[i].title, date : data[i].date, reg_start : data[i].reg_start, reg_end : data[i].reg_end, description : data[i].description, enrollees : data[i].enrollees, reach : data[i].reach, views : data[i].views, contact_details : JSON.stringify(data[i].contact_details), faq : data[i].faq}, true);
               } catch(e) {
                 console.log('Realm', e);
               }
@@ -178,7 +178,7 @@ class EventDetailScreen extends Component {
         if(hours > 1){
           var days = hours / 24;
           if(days > 1){
-            return Math.floor(days) + ' days ' + Math.floor(hours - Math.floor(days) * 60) + ' hours'; 
+            return Math.floor(days) + ' days ' + Math.floor(hours - Math.floor(days) * 24) + ' hours'; 
           }
           else {
             return Math.floor(hours) + ' hours ' + Math.floor(mins - Math.floor(hours) * 60) + ' mins'; 
@@ -196,11 +196,23 @@ class EventDetailScreen extends Component {
       return 'START';
     }
   }
+
+  handlePress = (item) =>{
+    if(this.state.loading) return;
+    if(this.state.active){
+      return this.props.navigation.navigate('CheckOutEvent', {item});
+    }
+
+    if(this.state.item && this.state.item.enrolled !== 'false'){
+      return this.props.navigation.navigate('CheckOutEvent', {item});
+    }
+  }
   
   render() {
     const { navigation } = this.props;
     const item = this.state.item == null ? navigation.getParam('item', {}) : this.state.item;
     const {goBack} = this.props.navigation;
+    console.log(item);
     const headerHeight = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_MAX_HEIGHT-HEADER_MIN_HEIGHT],
       outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
@@ -264,7 +276,7 @@ class EventDetailScreen extends Component {
               top: 15,
               right : 5,
             }}>
-            <TouchableOpacity onPress = {()=>console.log('heart')} style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}}>
+            <TouchableOpacity onPress = {this.love} style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}}>
               <Icon name = {'heart'} style={{ fontSize: 30, color : 'orange'}}/>
             </TouchableOpacity>
           </View>
@@ -353,8 +365,8 @@ class EventDetailScreen extends Component {
               resizeMode={FastImage.resizeMode.cover}/>
             <Text style={{color : 'rgb(31, 31, 92)', fontSize :22, alignSelf : 'center'}}>{'Event by '+ (''+item.channel).toUpperCase()}</Text>
             <Text style={{color : '#a5a5a5', fontSize :15, alignSelf : 'center'}}>{this.state.remTime === 0 ? 'Tap to enroll for this event' : this.state.remTime > 0 ? 'Registration will start in ' + this.parseRem(this.state.remTime) : 'Event Registration are Closed!'}</Text>
-            <TouchableOpacity style={{backgroundColor : this.state.loading ? '#a5a5a5' : this.state.active ? 'rgb(31, 31, 92)' : '#c5c5c5', borderRadius : 30, marginTop:10, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=> this.state.loading ? console.log('loading') : this.state.active ? this.props.navigation.navigate('CheckOutEvent', {item}) : console.log('NA')}>
-              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 10, paddingLeft : 10}}>{ this.state.loading ? 'LOADING' : this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
+            <TouchableOpacity style={{backgroundColor : this.state.loading ? '#a5a5a5' : this.state.active ? 'rgb(31, 31, 92)' : '#c5c5c5', borderRadius : 30, marginTop:10, justifyContent : 'center', alignSelf : 'center'}} onPress = { () => this.handlePress(item)}>
+              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 10, paddingLeft : 10}}>{ this.state.loading ? 'LOADING' : this.state.item.enrolled === 'true' ? 'View Ticket Details' : this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
             </TouchableOpacity>
             <Text style={{color : '#a5a5a5', fontSize :10, alignSelf : 'center', marginBottom:10, padding:5}}>Easy In-app Purchase</Text>
           </View>

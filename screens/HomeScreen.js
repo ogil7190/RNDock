@@ -93,7 +93,7 @@ class HomeScreen extends Component {
           el.date = new Date(el.date);
           el.reg_end = new Date(el.reg_end);
           el.reg_start = new Date(el.reg_start);
-          el.enrolled = '100';
+          el.enrolled = JSON.stringify(el.enrolled);
           el.enrollees = JSON.stringify(el.enrollees);
           el.media = JSON.stringify(el.media);
           el.contact_details = JSON.stringify(el.contact_details);
@@ -154,6 +154,16 @@ class HomeScreen extends Component {
     return data;
   }
 
+  unsave = async () =>{
+    Realm.getRealm((realm)=>{
+      realm.write(async () => {
+        realm.deleteAll();
+        await AsyncStorage.clear();
+        this.props.navigation.navigate('Login', {});
+      });
+    });
+  }
+
   render() {
     const event_list = this.state.event_list === null ? [] : this.state.event_list;
     StatusBar.setHidden(false);
@@ -170,7 +180,7 @@ class HomeScreen extends Component {
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
             <TouchableOpacity>
-              <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
+              <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' onPress={this.unsave}/>
             </TouchableOpacity>
           </View>
         </View>

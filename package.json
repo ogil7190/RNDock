@@ -7,9 +7,9 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "iphone": "react-native run-ios --device",
-    "iphone-release" : "react-native run-ios --configuration Release --device",
-    "ios-release" : "react-native run-ios --configuration Release",
-    "android-release" : "react-native run-android --variant=release",
+    "iphone-release": "react-native run-ios --configuration Release --device",
+    "ios-release": "react-native run-ios --configuration Release",
+    "android-release": "react-native run-android --variant=release",
     "test": "jest"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "react-native-ionicons": "^0.2.2",
     "react-native-linear-gradient": "^2.4.0",
     "react-native-modal": "^6.5.0",
+    "react-native-qrcode": "^0.2.7",
     "react-native-snackbar-component": "^1.0.9",
     "react-native-step-indicator": "0.0.9",
     "react-native-svg": "^6.5.2",

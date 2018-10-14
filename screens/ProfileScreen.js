@@ -73,7 +73,7 @@ class ProfileScreen extends Component {
             <Text style={{fontSize : 18, textAlign : 'left', textAlignVertical : 'center', marginLeft : 10}}>{this.state.user.name}</Text>
           </View>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
-            <Text style={{textAlign : 'center'}} numberOfLines = {2} ellipsizeMode = 'tail'>{'Its my fucking bio'}</Text>
+            <Text style={{textAlign : 'center'}} numberOfLines = {2} ellipsizeMode = 'tail'>{'It all starts with an idea!'}</Text>
           </View>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
             <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
@@ -97,7 +97,7 @@ class ProfileScreen extends Component {
           </View>
         </View>
         <View style={{flex : 1, justifyContent : 'center', alignItems : 'center'}}>
-          <TouchableOpacity onPress={()=>this.unsaveUser()} style={{backgroundColor : 'rgb(0,100, 0)', padding : 5, borderRadius : 10}}>
+          <TouchableOpacity onPress={()=>this.unsaveUser()} style={{backgroundColor : 'rgb(0,100, 0)', padding : 5, borderRadius : 20, paddingLeft : 10, paddingRight : 10}}>
             <Text style={{color : '#fff', fontSize : 18}}>LOGOUT</Text>
           </TouchableOpacity>
         </View>

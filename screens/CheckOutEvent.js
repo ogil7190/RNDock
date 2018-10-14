@@ -5,6 +5,7 @@ import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-ionicons';
 import axios from 'axios';
 import Realm from '../realmdb';
+import QRCode from 'react-native-qrcode';
 
 class CheckOutEvent extends Component {
   constructor(props) {
@@ -49,7 +50,7 @@ class CheckOutEvent extends Component {
       const data = JSON.parse(str);
       const token = data.token;
       if( token === null) return;
-      axios.post('https://mycampusdock.com/events/user/enroll', {_id : item._id}, {
+      axios.post('https://mycampusdock.com/events/user/purchase', {_id : item._id}, {
         headers: {
           'Content-Type': 'application/json',
           'x-access-token': token
@@ -60,7 +61,7 @@ class CheckOutEvent extends Component {
           this.setState({enrolled : true});
           Realm.getRealm((realm) => {
             realm.write(() => {
-              realm.create('Events', {_id : item._id, enrolled : '100'}, true);
+              realm.create('Events', {_id : item._id, enrolled : JSON.stringify(response.data.data)}, true);
             });
           });
         }
@@ -110,22 +111,38 @@ class CheckOutEvent extends Component {
                 />
               </View>
             </View>
-            <View style={{ marginTop : 30, backgroundColor : '#fff', padding : 15}}>
-              <Text style={{fontSize : 18, marginLeft : 15, marginRight : 15, marginBottom : 5}}>{'100% Refund on Cancellation'}</Text>
-              <Text style={{color : '#123', fontSize :15, marginRight : 15,marginLeft : 15,}}>{'Full refund on every purchase made on Dock at the time of cancelllation before event started.'}</Text>
-            </View>
-            <View style={{ marginTop : 30, backgroundColor : '#fff', padding : 15}}>
-              <Text style={{fontSize : 18, marginLeft : 15, marginRight : 15, marginBottom : 10, fontWeight : '500'}}>{'Payment Summary'}</Text>
-              <Text style={{fontSize : 16, marginLeft : 15, marginRight : 15, marginBottom : 5}}>{'Event Subtotal'}</Text>
-              <View style={{flexDirection : 'row'}}><Text style={{color : '#333', fontSize :15, marginRight : 15,marginLeft : 15,flex : 1}}>{'Price of Event X 1'}</Text><Text>{'₹'+item.price}</Text></View>
-              <View style={{flexDirection : 'row', marginTop : 5}}><Text style={{color : '#333', fontSize :15, marginRight : 15,marginLeft : 15,flex : 1}}>{'Discount Given'}</Text><Text>{'100%'}</Text></View>
-              <View style={{flexDirection : 'row', marginTop : 10}}><Text style={{color : '#123', fontSize :16, fontWeight : '500', marginRight : 15,marginLeft : 15,flex : 1}}>{'Total'}</Text><Text>{'₹0.0'}</Text></View>
-            </View>
-            <ActivityIndicator style={{margin : 5}} size = "small" color="rgb(31, 31, 92)" animating={this.state.loading}/>
             
-            <TouchableOpacity style={{backgroundColor :'rgb(31, 31, 92)', borderRadius : 30, marginTop:30, marginBottom : 30, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=>this.checkout(item)}>
-              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 20, paddingLeft : 20}}>{this.state.enrolled ? 'Successfully Enrolled' : 'Proceed to Pay ₹0.0'}</Text>
-            </TouchableOpacity>
+            {
+              item.enrolled === '100' ? <View>
+                <View style={{ marginTop : 30, backgroundColor : '#fff', padding : 15}}>
+                  <Text style={{fontSize : 18, marginLeft : 15, marginRight : 15, marginBottom : 5}}>{'100% Refund on Cancellation'}</Text>
+                  <Text style={{color : '#123', fontSize :15, marginRight : 15,marginLeft : 15,}}>{'Full refund on every purchase made on Dock at the time of cancelllation before event started.'}</Text>
+                </View>
+                <View style={{ marginTop : 30, backgroundColor : '#fff', padding : 15}}>
+                  <Text style={{fontSize : 18, marginLeft : 15, marginRight : 15, marginBottom : 10, fontWeight : '500'}}>{'Payment Summary'}</Text>
+                  <Text style={{fontSize : 16, marginLeft : 15, marginRight : 15, marginBottom : 5}}>{'Event Subtotal'}</Text>
+                  <View style={{flexDirection : 'row'}}><Text style={{color : '#333', fontSize :15, marginRight : 15,marginLeft : 15,flex : 1}}>{'Price of Event X 1'}</Text><Text>{'₹'+item.price}</Text></View>
+                  <View style={{flexDirection : 'row', marginTop : 5}}><Text style={{color : '#333', fontSize :15, marginRight : 15,marginLeft : 15,flex : 1}}>{'Discount Given'}</Text><Text>{'100%'}</Text></View>
+                  <View style={{flexDirection : 'row', marginTop : 10}}><Text style={{color : '#123', fontSize :16, fontWeight : '500', marginRight : 15,marginLeft : 15,flex : 1}}>{'Total'}</Text><Text>{'₹0.0'}</Text></View>
+                </View>
+                <ActivityIndicator style={{margin : 5}} size = "small" color="rgb(31, 31, 92)" animating={this.state.loading}/>
+            
+                <TouchableOpacity style={{backgroundColor :'rgb(31, 31, 92)', borderRadius : 30, marginTop:30, marginBottom : 30, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=>this.checkout(item)}>
+                  <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 20, paddingLeft : 20}}>{this.state.enrolled ? 'Successfully Enrolled' : 'Proceed to Pay ₹0.0'}</Text>
+                </TouchableOpacity>
+              </View> :
+                <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 50}}>
+                  <QRCode
+                    value={item.enrolled}
+                    size={200}
+                    bgColor='rgb(31, 31, 92)'
+                    fgColor='white'/>
+
+                  <Text style={{fontSize : 15, margin : 10}}>Verified Purchase.</Text>
+                  <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10}}>[ Please show this QR Code to verify ticket]</Text>
+                  <Text style={{fontSize : 15, marginTop : 15}}>Please do not forget to review this event.</Text>
+                </View>
+            }
           </ScrollView>
         </View>
       </View>

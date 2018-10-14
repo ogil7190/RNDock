@@ -62,9 +62,11 @@ const Channel = {
     description: 'string',
     category: 'string',
     followers: 'string',
+    creator: 'string',
     media: 'string',
     _id: 'string',
     followed : 'string',
+    priority : 'string'
   }
 };
 

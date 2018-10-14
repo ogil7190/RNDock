@@ -39,11 +39,13 @@ class ChannelDetailScreen extends Component {
         'Content-Type': 'application/json',
         'x-access-token': this.state.token
       }
-    }).then(response => {
+    }).then(response => { 
       if(!response.data.error){
         response.data.data.media = JSON.stringify(response.data.data.media);
         response.data.data.followers = ''+response.data.data.followers;
         response.data.data.followed = ''+response.data.data.followed;
+        response.data.data.priority = '' + response.data.data.priority;
+
         let channel = response.data.data;
         console.log('Fetched Channel : ', channel);
 

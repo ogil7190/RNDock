@@ -139,7 +139,7 @@ class CheckOutEvent extends Component {
                     fgColor='white'/>
 
                   <Text style={{fontSize : 15, margin : 10}}>Verified Purchase.</Text>
-                  <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10}}>[ Please show this QR Code to verify ticket]</Text>
+                  <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10}}>[ Please show this QR Code to verify ticket ]</Text>
                   <Text style={{fontSize : 15, marginTop : 15}}>Please do not forget to review this event.</Text>
                 </View>
             }

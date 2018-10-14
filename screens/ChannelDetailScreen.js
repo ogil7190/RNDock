@@ -349,7 +349,7 @@ class ChannelDetailScreen extends Component {
         <View style={{padding : 20, backgroundColor : '#fff',}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
             <FastImage
-              style={{height: 72, width: 72, borderRadius : 40,}}
+              style={{height: 72, width: 72, borderRadius : 40, borderWidth : 1, borderColor : '#c5c5c5'}}
               source={{
                 uri : this.state.channel ? 'https://mycampusdock.com/' + JSON.parse(this.state.channel.media)[0] : 'NONE' ,
                 priority : FastImage.priority.high

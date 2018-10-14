@@ -40,27 +40,29 @@ class ChannelScreen extends Component {
     try {
       const str = await AsyncStorage.getItem('data');
       const data = JSON.parse(str);
+      const college = data.data.college;
       const token = data.token;
       if( token === null) return;
-      this.setState({ token });
-      this.populate_channels();
-      await this.fetch_channels(token);
+      this.setState({ token, college });
+      this.populate_channels(college);
+      await this.fetch_channels(token, college);
     } catch(Exception) {
       console.log(Exception);
     }
   }
 
-  populate_channels = () =>{
+  populate_channels = (college) =>{
     Realm.getRealm((realm) => {
-      var data = realm.objects('Channel').filtered('creator = "'+ 'MRIIRS' +'"');
+      var data = realm.objects('Channel').filtered('creator = "'+ college +'"');
       this.process_realm_obj(data, (result)=>{
         this.setState({college_popular_channels : result});
       });
     });
   }
 
-  fetch_channels = (token) => {
-    axios.post('https://mycampusdock.com/channels/user/fetch-college-channels', { college : 'MRIIRS' }, {
+  fetch_channels = (token, college) => {
+    this.setState({ isRefreshing: true });
+    axios.post('https://mycampusdock.com/channels/user/fetch-college-channels', { college }, {
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': token
@@ -80,8 +82,8 @@ class ChannelScreen extends Component {
             for(var i=0;i<data.length;i++) {
               realm.create('Channel', data[i], true);
             }
+            this.populate_channels(college);
           });
-          this.populate_channels();
         });
       }
     }).catch( err => {
@@ -110,7 +112,7 @@ class ChannelScreen extends Component {
           </View>
         </View>
         <ScrollView
-          style = {{backgroundColor: 'transparent'}}
+          style = {{backgroundColor: 'transparent', marginTop : 10}}
           refreshControl={
             <RefreshControl
               colors={['rgb(31, 31, 92)']}
@@ -122,9 +124,10 @@ class ChannelScreen extends Component {
           <CustomList 
             title = "Popular Across College" 
             showTitle = {true}
+            style = {{marginTop : 10}}
             isHorizontal = {true}
             data = {this.state.college_popular_channels}
-            onRender = {({item})=> <ChannelCard data={item} onPress = {()=> console.log('clicked')} />}/>
+            onRender = {({item})=> <ChannelCard data={item} onPress = {()=> this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item._id, item : item})} />}/>
 
         </ScrollView>
       </View>

@@ -24,7 +24,7 @@ class CustomList extends Component {
     return (
       <View>
         {
-          this.state.showTitle ? <Text style={{fontSize : 18, marginLeft :15, marginTop : 5, marginBottom:5}}>
+          this.state.showTitle ? <Text style={{fontSize : 18, marginLeft :15, marginTop : 10, marginBottom:5}}>
             {'' + this.props.title}
             { this.props.showMark ? <Text  style={{color : 'red', fontSize : 25}}> • </Text> : ''}
           </Text> : <View/>

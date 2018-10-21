@@ -212,7 +212,7 @@ class EventDetailScreen extends Component {
     const { navigation } = this.props;
     const item = this.state.item == null ? navigation.getParam('item', {}) : this.state.item;
     const {goBack} = this.props.navigation;
-    console.log(item);
+
     const headerHeight = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_MAX_HEIGHT-HEADER_MIN_HEIGHT],
       outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
@@ -359,14 +359,14 @@ class EventDetailScreen extends Component {
             <FastImage
               style= {{width : 56, height : 56, borderRadius : 12, margin:5, marginTop : 10, alignSelf : 'center'}}
               source={{
-                uri : 'https://mycampusdock.com/' + (''+item.channel).trim().split(' ').join('_') +'/logo.webp',
+                uri : 'https://mycampusdock.com/channels/' + item.channel + '.webp',
                 priority: FastImage.priority.high,
               }}
               resizeMode={FastImage.resizeMode.cover}/>
-            <Text style={{color : 'rgb(31, 31, 92)', fontSize :22, alignSelf : 'center'}}>{'Event by '+ (''+item.channel).toUpperCase()}</Text>
+            <Text style={{color : 'rgb(31, 31, 92)', fontSize :22, alignSelf : 'center'}}>{'Event by '+ (''+item.channel_name).toUpperCase()}</Text>
             <Text style={{color : '#a5a5a5', fontSize :15, alignSelf : 'center'}}>{this.state.remTime === 0 ? 'Tap to enroll for this event' : this.state.remTime > 0 ? 'Registration will start in ' + this.parseRem(this.state.remTime) : 'Event Registration are Closed!'}</Text>
             <TouchableOpacity style={{backgroundColor : this.state.loading ? '#a5a5a5' : this.state.active ? 'rgb(31, 31, 92)' : '#c5c5c5', borderRadius : 30, marginTop:10, justifyContent : 'center', alignSelf : 'center'}} onPress = { () => this.handlePress(item)}>
-              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 10, paddingLeft : 10}}>{ this.state.loading ? 'LOADING' : this.state.item.enrolled === 'true' ? 'View Ticket Details' : this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
+              <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 10, paddingLeft : 10}}>{ this.state.loading ? 'LOADING' : this.state.item.enrolled !== 'false' ? 'View Ticket Details' : this.state.active ? 'ENROLL' : this.state.remTime > 0 ? 'Coming Soon' : 'CLOSED'}</Text>
             </TouchableOpacity>
             <Text style={{color : '#a5a5a5', fontSize :10, alignSelf : 'center', marginBottom:10, padding:5}}>Easy In-app Purchase</Text>
           </View>

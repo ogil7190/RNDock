@@ -8,9 +8,6 @@ import FastImage from 'react-native-fast-image';
 class ChannelCard extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      subscribed_icon : 'add-circle',
-    };
   }
 
   render() {
@@ -27,7 +24,7 @@ class ChannelCard extends Component {
                 }}
                 resizeMode={FastImage.resizeMode.cover}
               />
-              <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.7)']} style={{
+              <LinearGradient colors={['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']} style={{
                 width : '100%',
                 height : 150,
                 top: 0

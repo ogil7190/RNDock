@@ -40,7 +40,7 @@ class FlatCard extends Component {
   render() {
     return (
       <TouchableWithoutFeedback onPress={ () => this.props.onPress(this.props.data, this.card)}>
-        <View ref={(viewRef) => this.card = viewRef} style = {{height : 400,  marginBottom : 15, shadowOpacity : 0.4, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:15}}>
+        <View ref={(viewRef) => this.card = viewRef} style = {{height : 400,  marginBottom : 15, shadowOpacity : 0.4, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:15, marginRight : 15, marginLeft : 15, margin : 10}}>
           <View >
             <View>
               <FastImage
@@ -57,16 +57,16 @@ class FlatCard extends Component {
               }}>
                 <View style={{margin:20, flex : 10}}>
                   <Text 
-                    style={{color : '#c5c5e5', textAlign:'left', fontSize : 15, fontWeight : '500'}}>
+                    style={{color : '#c5c5e5', textAlign:'left', fontSize : 15,}}>
                     {(''+this.props.channel).toUpperCase()}
                   </Text>
                   <Text 
-                    style={{color : 'white', marginRight : 10, marginTop : 10, fontSize : 30, fontWeight : '600'}}>
+                    style={{color : 'white', marginRight : 10, marginTop : 10, fontSize : 30,}}>
                     {this.props.title}
                   </Text>
                 </View>
                 <View style={{flex : 1, marginLeft : 20, marginBottom:10, marginRight :20}}>
-                  <Text style={{color : '#efefef', fontSize : 15, fontWeight : '500'}} ellipsizeMode='tail' numberOfLines={1}>
+                  <Text style={{color : '#efefef', fontSize : 15,}} ellipsizeMode='tail' numberOfLines={1}>
                     { this.parseDate(this.props.data.date) + ' • ' + this.parseTime(this.props.data.date)+ ' • ' + this.props.data.location}
                   </Text>
                 </View>
@@ -78,6 +78,7 @@ class FlatCard extends Component {
       </TouchableWithoutFeedback>
     );
   }
+
 }
 
 FlatCard.propTypes = {

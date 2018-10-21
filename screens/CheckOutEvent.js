@@ -56,7 +56,6 @@ class CheckOutEvent extends Component {
           'x-access-token': token
         }
       }).then( response => {
-        console.log(response.data);
         if(!response.data.error){
           this.setState({enrolled : true});
           Realm.getRealm((realm) => {
@@ -87,14 +86,14 @@ class CheckOutEvent extends Component {
             <TouchableOpacity onPress = {()=>goBack()} style= {{marginTop : 15, marginLeft : 5}}>
               <Icon name="arrow-back" style={{ color: '#000', fontSize: 30}}/>
             </TouchableOpacity>
-            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', alignContent : 'center'}}>{'Checkout Now'}</Text>
+            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', alignContent : 'center'}}>{ item.enrolled === 'false' ? 'Checkout Now' : 'Event Details'}</Text>
           </View>
           <ScrollView
             scrollEventThrottle={5}>
             <View style={{flexDirection : 'row', marginTop: 15, padding : 10, backgroundColor : '#fff'}}>
               <View style={{marginLeft : 15, marginTop : 10, flex : 3}}>
                 <Text style={{fontSize : 18}}>{item.title}</Text>
-                <Text style={{fontSize : 15, color : '#c5c5c5', marginTop : 5}}>{'Event by '+ (''+item.channel).toUpperCase()}</Text>
+                <Text style={{fontSize : 15, color : '#c5c5c5', marginTop : 5}}>{'Event by '+ (''+item.channel_name).toUpperCase()}</Text>
                 <Text style={{fontSize : 15,marginTop : 5}}>{this.parseDate(item.date)}</Text>
                 <Text style={{fontSize : 15,marginTop : 5}}>{this.parseTime(item.date)}</Text>
                 <Text style={{fontSize : 15,marginTop : 5}}>{item.location}</Text>
@@ -113,7 +112,7 @@ class CheckOutEvent extends Component {
             </View>
             
             {
-              item.enrolled === '100' ? <View>
+              item.enrolled === 'false' ? <View>
                 <View style={{ marginTop : 30, backgroundColor : '#fff', padding : 15}}>
                   <Text style={{fontSize : 18, marginLeft : 15, marginRight : 15, marginBottom : 5}}>{'100% Refund on Cancellation'}</Text>
                   <Text style={{color : '#123', fontSize :15, marginRight : 15,marginLeft : 15,}}>{'Full refund on every purchase made on Dock at the time of cancelllation before event started.'}</Text>
@@ -130,6 +129,7 @@ class CheckOutEvent extends Component {
                 <TouchableOpacity style={{backgroundColor :'rgb(31, 31, 92)', borderRadius : 30, marginTop:30, marginBottom : 30, justifyContent : 'center', alignSelf : 'center'}} onPress = {()=>this.checkout(item)}>
                   <Text style={{color : '#fff', fontSize :18, margin : 5, padding : 5, paddingRight : 20, paddingLeft : 20}}>{this.state.enrolled ? 'Successfully Enrolled' : 'Proceed to Pay ₹0.0'}</Text>
                 </TouchableOpacity>
+
               </View> :
                 <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 50}}>
                   <QRCode
@@ -137,8 +137,7 @@ class CheckOutEvent extends Component {
                     size={200}
                     bgColor='rgb(31, 31, 92)'
                     fgColor='white'/>
-
-                  <Text style={{fontSize : 15, margin : 10}}>Verified Purchase.</Text>
+                  <Text style={{fontSize : 15, margin : 10}}>Verified Purchase  <Icon name = {'checkmark-circle'} style={{fontSize : 18, color : 'green'}}/></Text>
                   <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10}}>[ Please show this QR Code to verify ticket ]</Text>
                   <Text style={{fontSize : 15, marginTop : 15}}>Please do not forget to review this event.</Text>
                 </View>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage, FlatList } from 'react-native';
+import { ScrollView, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import FlatCardChannel from './components/FlatCardChannel';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import Realm from '../realmdb';
 import Icon from 'react-native-ionicons';
 import FlatCard from './components/FlatCard';
+import FlatCardHorizontal from './components/FlatCardHorizontal';
 import FirebaseModule from './FirebaseModule';
 
 class HomeScreen extends Component {
@@ -40,6 +41,8 @@ class HomeScreen extends Component {
   state = {
     isRefreshing: false,
     event_list: null,
+    week_events : [],
+    channels : []
   }
 
   handleSubscription = async () =>{
@@ -85,12 +88,13 @@ class HomeScreen extends Component {
         'x-access-token': token
       }
     }).then( response => {
-      console.log(response);
       if(!response.data.error) {
         response.data.data.forEach((el)=>{
           el.audience = JSON.stringify(el.audience);
           el.timestamp = new Date(el.timestamp);
+          let ts = Date.parse(''+el.date);
           el.date = new Date(el.date);
+          el.ms = ts;
           el.reg_end = new Date(el.reg_end);
           el.reg_start = new Date(el.reg_start);
           el.enrolled = JSON.stringify(el.enrolled);
@@ -112,6 +116,15 @@ class HomeScreen extends Component {
       });
   }
 
+  listChannelUpdates = () =>{
+    Realm.getRealm((realm) => {
+      let channels = realm.objects('Channel').filtered('followed = "true"').sorted('timestamp');
+      this.process_realm_obj(channels, (result)=>{
+        console.log(result);
+        this.setState({channels : result});
+      });
+    });
+  }
 
   update_event_list = async () => {
     let { token } = this.state;
@@ -125,6 +138,7 @@ class HomeScreen extends Component {
       } catch(e) {
         timestamp = 'NONE';
       }
+
       this.fetch_event_data(token, timestamp, (data) => {
         if(data.length === 0) return;
         realm.write(() => {
@@ -139,19 +153,20 @@ class HomeScreen extends Component {
         }); 
       });
 
-      let Events = realm.objects('Events').sorted('timestamp');
-      process_realm_obj(Events, (result) => {
-        this.setState({ event_list: result.reverse() });
+      let Events = realm.objects('Events').filtered('enrolled = "false"').sorted('date');
+      let ts = Date.parse(new Date()) - (7 * 24 * 60 * 60 * 1000);
+      let week_events = realm.objects('Events').filtered('enrolled = "false"').filtered('ms > ' + ts).sorted('date');
+      
+      process_realm_obj(week_events, (result) => {
+        this.setState({ week_events : result});
       });  
-    });
-  }
 
-  getChannelUpdatesData = () =>{
-    const data = [
-      { image : 'https://mycampusdock.com/channels/dock.webp', title : 'Dock Blog Launched', channel_id : 'ogil7190', name : 'OGIL7190', data : 'Something', url : 'Something'},
-      { image : 'https://mycampusdock.com/channels/dock-manager.webp', title : 'Dock Payments Portal Launched', name : 'Menime', channel_id : 'menime', data : 'Something', url : 'Something'}
-    ];
-    return data;
+      process_realm_obj(Events, (result) => {
+        this.setState({ event_list : result});
+      });
+      
+      this.listChannelUpdates();
+    });
   }
 
   unsave = async () =>{
@@ -198,33 +213,30 @@ class HomeScreen extends Component {
             showTitle = {true}
             showMark ={true}
             isHorizontal = {true}
-            style={{margin : 5, marginLeft : 10, marginRight : 10}}
-            data = {this.getChannelUpdatesData()}
-            onRender = {({item})=> <FlatCardChannel image = {item.image} title = {item.title} channel_id = {item.channel_id} data = {item.data} url = {item.url} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item.channel_id, item : item})} /> }/>
-          
-          {/* <CustomList
-            title = "All about Today"
-            showTitle = {true}
-            showMark = {true}
-            data={event_list}
-            isHorizontal = {true}
-            onRender={(item) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+            data = {this.state.channels}
+            onRender = {({item})=> <FlatCardChannel data = {item} onPress={()=>this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item._id, item : item})} /> }/>
           
           <CustomList
+            title = "This Week"
+            data={this.state.week_events}
+            showTitle = {true}
+            isHorizontal = {true}
+            onRender={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+          
+          {/* <CustomList
             title = "From Your Channels"
-            data={event_list}
+            data={[]}
             showTitle = {true}
             showMark = {true}
             isHorizontal = {true}
-            onRender={(item) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/> */}
+            onRender={(item) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/> */}
 
           <CustomList
             title = "Upcoming Events"
             data={event_list}
             showTitle = {true}
-            style={{margin : 10, marginLeft : 15, marginRight : 15}}
             isHorizontal = {false}
-            onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+            onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
         </ScrollView>
       </View>
     );

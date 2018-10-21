@@ -44,11 +44,8 @@ class ChannelDetailScreen extends Component {
         response.data.data.media = JSON.stringify(response.data.data.media);
         response.data.data.followers = ''+response.data.data.followers;
         response.data.data.followed = ''+response.data.data.followed;
-        response.data.data.priority = '' + response.data.data.priority;
 
         let channel = response.data.data;
-        console.log('Fetched Channel : ', channel);
-
         Realm.getRealm((realm) => {
           realm.write(() => {
             realm.create('Channel', channel, true);
@@ -72,6 +69,7 @@ class ChannelDetailScreen extends Component {
                     console.log(e);
                   }
                 }
+                if(activities.length > 0) realm.create('Channel', {_id : channel_id, timestamp : new Date()}, true);
               });
               this.setChannel(channel_id, (exists)=>{
                 console.log(exists);
@@ -99,7 +97,6 @@ class ChannelDetailScreen extends Component {
         'x-access-token': this.state.token
       }
     }).then( response => {
-      console.log(response.data);
       if(!response.data.error) {
         response.data.data.forEach((el)=>{
           el.options = el.type === 'poll' ? JSON.stringify(el.options) : 'NONE';
@@ -162,7 +159,6 @@ class ChannelDetailScreen extends Component {
     Realm.getRealm((realm) => {
       let channels = realm.objects('Channel').filtered('_id = "' + channel_id + '"');
       this.process_realm_obj(channels, (channels) => {
-        console.log('Got Channel', channels);
         if(channels.length > 0){
           let Activity = realm.objects('Activity').filtered('channel = "'+channel_id +'"').sorted('timestamp', true);
           this.process_realm_obj(Activity, (activities) => {
@@ -276,7 +272,7 @@ class ChannelDetailScreen extends Component {
           showsPagination={false}>
           <ScrollView style={{flex : 1}}>
             {
-              Object.entries(this.state.sorted_activities).map((data, index) =>
+              this.state.sorted_activities.length > 0 ? Object.entries(this.state.sorted_activities).map((data, index) =>
                 <View  key= {index} style={{backgroundColor : 'rgb(250, 250, 250)'}}>
                   <View style={{flexDirection : 'row', margin : 10}}>
                     <View style={{backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, paddingRight : 10, paddingLeft : 10}} >
@@ -293,15 +289,20 @@ class ChannelDetailScreen extends Component {
                     data={data[1]}
                     numColumns = {3}
                     renderItem={(item)=> <Story data = {item} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : [item]})}/>} /> 
-                </View>
-              )
+                </View> ) : <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 10}}><Text style={{fontSize : 20, color : '#a5a5a5'}}>No Recent Activity</Text></View>
             }
           </ScrollView>
-          <FlatList
-            style={{backgroundColor : 'rgb(250, 250, 250)', paddingLeft : 20, paddingRight : 20, paddingTop : 10}}
-            keyExtractor={(item, index) => index.toString()}
-            data={this.state.events}
-            renderItem={({item}) => <FlatCardList image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title}channel = {item.channel} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+          <View>
+            {
+              this.state.events.length > 0 
+                ? <FlatList
+                  style={{backgroundColor : 'rgb(250, 250, 250)', paddingLeft : 20, paddingRight : 20, paddingTop : 10}}
+                  keyExtractor={(item, index) => index.toString()}
+                  data={this.state.events}
+                  renderItem={({item}) => <FlatCardList image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+                : <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 10}}><Text style={{fontSize : 20, color : '#a5a5a5'}}>No Recent Events</Text></View>
+            }
+          </View>
         </Swiper>
       </View>);
   }
@@ -341,7 +342,7 @@ class ChannelDetailScreen extends Component {
         <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, justifyContent : 'center', alignItems : 'center'}}>
           <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
             <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 10}}>
-              <Icon name="arrow-back" style={{ color: 'red', fontSize: 30, textAlign : 'center'}}/>
+              <Icon name="arrow-back" style={{ fontSize: 30, textAlign : 'center'}}/>
             </TouchableOpacity>
             <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', paddingRight : 20,  alignContent : 'center'}}>{this.state.channel ? this.state.channel.name : 'Channel'}</Text>
           </View>

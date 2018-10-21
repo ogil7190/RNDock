@@ -11,12 +11,14 @@ const Events = {
     category: 'string',
     college: 'string',
     channel : 'string',
+    channel_name : 'string',
     enrolled : 'string',
     contact_details: 'string',
     date: 'date',
     description: 'string',
     email: 'string',
     enrollees: 'string',
+    ms : 'int',
     faq: 'string',
     location: 'string',
     media: 'string',
@@ -66,7 +68,8 @@ const Channel = {
     media: 'string',
     _id: 'string',
     followed : 'string',
-    priority : 'string'
+    priority : 'int',
+    timestamp: {type: 'date', optional: true}
   }
 };
 

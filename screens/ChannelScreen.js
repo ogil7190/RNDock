@@ -53,7 +53,7 @@ class ChannelScreen extends Component {
 
   populate_channels = (college) =>{
     Realm.getRealm((realm) => {
-      var data = realm.objects('Channel').filtered('creator = "'+ college +'"');
+      var data = realm.objects('Channel').filtered('creator = "'+ college +'" AND priority >= 4');
       this.process_realm_obj(data, (result)=>{
         this.setState({college_popular_channels : result});
       });
@@ -72,7 +72,6 @@ class ChannelScreen extends Component {
         response.data.data.forEach((el)=>{
           el.media = JSON.stringify(el.media);
           el.followers = ''+el.followers;
-          el.priority = ''+el.priority;
           el.followed = ''+el.followed;
         });
         

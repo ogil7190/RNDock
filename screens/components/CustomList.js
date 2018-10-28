@@ -21,10 +21,17 @@ class CustomList extends Component {
   }
 
   render() {
+    let showTitle = this.props.showTitle ? true : false;
+    if(this.props.automaticTitle){
+      if(this.props.data.length > 0)
+        showTitle = true;
+      else
+        showTitle = false;
+    }
     return (
       <View>
         {
-          this.state.showTitle ? <Text style={{fontSize : 18, marginLeft :15, marginTop : 10, marginBottom:5}}>
+          showTitle ? <Text style={{fontSize : 18, marginLeft :15, marginTop : 10, marginBottom:5}}>
             {'' + this.props.title}
             { this.props.showMark ? <Text  style={{color : 'red', fontSize : 25}}> • </Text> : ''}
           </Text> : <View/>

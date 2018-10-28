@@ -49,6 +49,7 @@ const Activity = {
     media: 'string',
     timestamp: 'date',
     type: 'string',
+    watched : {type: 'string', optional: true},
     poll_type : 'string',
     answered: 'string',
     views: 'string',
@@ -68,8 +69,8 @@ const Channel = {
     media: 'string',
     _id: 'string',
     followed : 'string',
+    requested : 'string',
     priority : 'int',
-    timestamp: {type: 'date', optional: true}
   }
 };
 

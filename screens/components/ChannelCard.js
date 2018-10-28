@@ -14,19 +14,19 @@ class ChannelCard extends Component {
     const dimensions = Dimensions.get('window');
     return (
       <TouchableOpacity onPress = {()=> this.props.onPress()}>
-        <View style = {{height : 150, width : 0.6 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
+        <View style = {{height : 120, width : 0.6 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
           <View style = {{borderRadius : 8, overflow:'hidden'}}>
             <View cardBody>
               <FastImage
-                style={{height: 150, width: '100%', flex: 1, position :'absolute'}}
+                style={{height: 120, width: '100%', flex: 1, position :'absolute'}}
                 source={{
-                  uri : 'https://mycampusdock.com/' + JSON.parse(this.props.data.media)[0],
+                  uri : 'https://mycampusdock.com/' +  ( typeof this.props.data.media === 'string' ? JSON.parse(this.props.data.media)[0] : this.props.data.media[0] ),
                 }}
                 resizeMode={FastImage.resizeMode.cover}
               />
-              <LinearGradient colors={['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']} style={{
+              <LinearGradient colors={['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.6)']} style={{
                 width : '100%',
-                height : 150,
+                height : 120,
                 top: 0
               }}>
                 <View style={{flex : 4}}>

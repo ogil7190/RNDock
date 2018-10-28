@@ -7,6 +7,7 @@ import Icon from 'react-native-ionicons';
 import axios from 'axios';
 import Realm from '../realmdb';
 import Toast, {DURATION} from 'react-native-easy-toast';
+import FloatingHearts from 'react-native-floating-hearts'
 
 const HEADER_MAX_HEIGHT = 300;
 const HEADER_MIN_HEIGHT = 70;
@@ -24,6 +25,7 @@ class EventDetailScreen extends Component {
     active : false,
     remTime : null,
     item : null,
+    count : 0, 
     loading : true,
     avilable : false,
     error : ''
@@ -197,6 +199,13 @@ class EventDetailScreen extends Component {
     }
   }
 
+  love = () =>{
+    var lover = setInterval(()=>{
+      if(this.state.count > 3) clearInterval(lover);
+      this.setState({count : this.state.count + 1});
+    }, 200);
+  }
+
   handlePress = (item) =>{
     if(this.state.loading) return;
     if(this.state.active){
@@ -235,6 +244,7 @@ class EventDetailScreen extends Component {
           backgroundColor={'transparent'}
           translucent
           barStyle="light-content"/>
+        
         <Animated.View style={{ 
           position: 'absolute',  
           top: 0,
@@ -276,10 +286,14 @@ class EventDetailScreen extends Component {
               top: 15,
               right : 5,
             }}>
-            <TouchableOpacity onPress = {this.love} style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}}>
-              <Icon name = {'heart'} style={{ fontSize: 30, color : 'orange'}}/>
+            <TouchableOpacity style= {{width : 36, height : 36, marginTop : 15, marginLeft : 5}} onPress ={()=>this.love()}>
+              <View style={{flexDirection : 'column'}}>
+                <Icon name = {'heart'} style={{ fontSize: 30, color : 'orange'}}/>
+              </View>
             </TouchableOpacity>
           </View>
+          
+          <FloatingHearts count={this.state.count} color={'orange'}/>
         </Animated.View>
         <ScrollView
           scrollEventThrottle={16}

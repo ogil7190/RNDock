@@ -50,7 +50,7 @@ class ChannelUsersScreen extends Component {
             <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, justifyContent : 'center', alignItems : 'center'}}>
               <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
                 <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 10}}>
-                  <Icon name="arrow-back" style={{ color: 'red', fontSize: 30, textAlign : 'center'}}/>
+                  <Icon name="arrow-back" style={{ fontSize: 30, textAlign : 'center'}}/>
                 </TouchableOpacity>
                 <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', paddingRight : 20,  alignContent : 'center'}}>{this.state.channel ? this.state.channel.name : 'Channel'}</Text>
               </View>
@@ -58,7 +58,7 @@ class ChannelUsersScreen extends Component {
             <View style={{padding : 20, backgroundColor : '#fff', }}>
               <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
                 <FastImage
-                  style={{height: 72, width: 72, borderRadius : 40,}}
+                  style={{height: 72, width: 72, borderRadius : 40, borderWidth : 1, borderColor : '#c5c5c5'}}
                   source={{
                     uri : this.state.channel ? 'https://mycampusdock.com/' + JSON.parse(this.state.channel.media)[0] : 'NONE' ,
                     priority : FastImage.priority.high

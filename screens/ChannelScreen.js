@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, Text, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage, FlatList } from 'react-native';
+import { ScrollView, Platform, View, Image, StatusBar, TouchableOpacity, RefreshControl, AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import axios from 'axios';
@@ -33,34 +33,85 @@ class ChannelScreen extends Component {
   state = {
     isRefreshing: false,
     event_list: null,
-    college_popular_channels : []
+    college_popular_channels : [],
+    from_my_interests : [],
+    explore : []
   }
 
   update_user_token = async () => {
     try {
       const str = await AsyncStorage.getItem('data');
-      const data = JSON.parse(str);
-      const college = data.data.college;
-      const token = data.token;
-      if( token === null) return;
+      const bundle = JSON.parse(str);
+      const data = bundle.data;
+      const college = data.college;
+      const interests = data.interests;
+      const token = bundle.token;
       this.setState({ token, college });
-      this.populate_channels(college);
-      await this.fetch_channels(token, college);
+      this.fetch_channels(token, college, ()=>{
+        this.fetch_suggestions(token, interests);
+      });
     } catch(Exception) {
       console.log(Exception);
     }
   }
 
-  populate_channels = (college) =>{
+  fetch_suggestions = (token, interests) =>{
+    this.setState({ isRefreshing: true });
     Realm.getRealm((realm) => {
-      var data = realm.objects('Channel').filtered('creator = "'+ college +'" AND priority >= 4');
+      let channels = realm.objects('Channel').filtered('followed = "true"');
+      this.process_realm_obj(channels, (result)=>{
+        let followed_channels = [];
+        for(var i=0; i<result.length; i++){
+          followed_channels.push(result[i]._id);
+        }
+        axios.post('https://mycampusdock.com/channels/top', { count : 20, category_list : JSON.stringify(interests), channels_list : JSON.stringify(followed_channels) }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+          }
+        }).then(response => {
+          if(response.data.error) console.log(response.data.error);
+          else{
+            let from_my_interests = response.data.data;
+            let areas = ['Technology', 'Coding', 'Entertainment', 'Fashion', 'Sports', 'Science', 'Literature', 'Culture', 'Social', 'Art & Craft', 'Business', 'Politics'];
+            let others = [];
+            for(var i=0; i<areas.length; i++){
+              if(interests.includes(areas[i])) continue;
+              others.push(areas[i]);
+            }
+            axios.post('https://mycampusdock.com/channels/top', { count : 20, category_list : JSON.stringify(others), channels_list : JSON.stringify(followed_channels) }, {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': token
+              }
+            }).then(response => {
+              if(response.data.error) console.log(response.data.error);
+              else{
+                this.setState({ from_my_interests, explore : response.data.data, isRefreshing : false});
+              }
+            }).catch( err => {
+              console.log('My error', err);
+              this.setState({ isRefreshing: false });
+            });
+          }
+        }).catch( err => {
+          console.log('My error', err);
+          this.setState({ isRefreshing: false });
+        });
+      });
+    });
+  }
+
+  populate_channels = () =>{
+    Realm.getRealm((realm) => {
+      var data = realm.objects('Channel').filtered('priority >= 4');
       this.process_realm_obj(data, (result)=>{
         this.setState({college_popular_channels : result});
       });
     });
   }
 
-  fetch_channels = (token, college) => {
+  fetch_channels = (token, college, callback) => {
     this.setState({ isRefreshing: true });
     axios.post('https://mycampusdock.com/channels/user/fetch-college-channels', { college }, {
       headers: {
@@ -73,6 +124,7 @@ class ChannelScreen extends Component {
           el.media = JSON.stringify(el.media);
           el.followers = ''+el.followers;
           el.followed = ''+el.followed;
+          el.requested = ''+el.requested;
         });
         
         var data = response.data.data;
@@ -81,7 +133,7 @@ class ChannelScreen extends Component {
             for(var i=0;i<data.length;i++) {
               realm.create('Channel', data[i], true);
             }
-            this.populate_channels(college);
+            this.populate_channels();
           });
         });
       }
@@ -89,6 +141,7 @@ class ChannelScreen extends Component {
       console.log(err);
     }).then( () => {
       this.setState({ isRefreshing: false });
+      callback();
     });
   }
 
@@ -99,7 +152,7 @@ class ChannelScreen extends Component {
           backgroundColor="rgb(31, 31, 92)"
           translucent
           barStyle="light-content"/>
-        <View style = {{ backgroundColor : 'rgb(31, 31, 92)', height : 75, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.6, shadowOffset : {width : 1, height : 1}, elevation : 6}}>
+        <View style = {{ backgroundColor : 'rgb(31, 31, 92)', height : 80, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.6, shadowOffset : {width : 1, height : 1}, elevation : 6, paddingBottom : 5}}>
           <View style = {{ marginTop : Platform.OS === 'android' ? 25 : 10, flex : 1, flexDirection : 'row', paddingBottom : 5,}}>
             <TouchableOpacity onPress = {()=>this.props.navigation.openDrawer()}>
               <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
@@ -121,11 +174,30 @@ class ChannelScreen extends Component {
           }>
           
           <CustomList 
-            title = "Popular Across College" 
+            title = "Recommended By College" 
             showTitle = {true}
+            automaticTitle = {true}
             style = {{marginTop : 10}}
             isHorizontal = {true}
             data = {this.state.college_popular_channels}
+            onRender = {({item})=> <ChannelCard data={item} onPress = {()=> this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item._id, item : item})} />}/>
+
+          <CustomList
+            title = "Suggested For You"
+            showTitle = {true}
+            automaticTitle = {true}
+            style = {{marginTop : 10}}
+            isHorizontal = {true}
+            data = {this.state.from_my_interests}
+            onRender = {({item})=> <ChannelCard data={item} onPress = {()=> this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item._id, item : item})} />}/>
+
+          <CustomList
+            title = "Explore Out of Box"
+            showTitle = {true}
+            automaticTitle = {true}
+            style = {{marginTop : 10}}
+            isHorizontal = {true}
+            data = {this.state.explore}
             onRender = {({item})=> <ChannelCard data={item} onPress = {()=> this.props.navigation.navigate('ChannelDetailScreen', {channel_id : item._id, item : item})} />}/>
 
         </ScrollView>

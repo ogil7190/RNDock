@@ -18,7 +18,6 @@ import CheckOutEvent from './screens/CheckOutEvent';
 import { createDrawerNavigator, DrawerItems } from 'react-navigation';
 import MyEvents from './screens/MyEvents';
 import Settings from './screens/Settings';
-import Bookmarks from './screens/Bookmarks';
 import StoryPreview from './screens/StoryPreview';
 import InterestSelectionScreen from './screens/InterestSelectionScreen';
 import ChannelDetailScreen from './screens/ChannelDetailScreen';
@@ -46,24 +45,17 @@ const Nav = createDrawerNavigator({
       drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
     }
   },
-  Bookmarks : {
-    screen : Bookmarks,
-    navigationOptions: {
-      title : 'My Bookmarks',
-      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
-    }
-  },
   Settings : {
     screen : Settings,
     navigationOptions: {
-      title : 'My Settings',
+      title : 'Settings',
       drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
     }
   }
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});;
+});
 
 const Nav2 = createDrawerNavigator({
   ChannelScreen: {
@@ -76,24 +68,17 @@ const Nav2 = createDrawerNavigator({
       drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
     }
   },
-  Bookmarks : {
-    screen : Bookmarks,
-    navigationOptions: {
-      title : 'My Bookmarks',
-      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
-    }
-  },
   Settings : {
     screen : Settings,
     navigationOptions: {
-      title : 'My Settings',
+      title : 'Settings',
       drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
     }
   }
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});;
+});
 
 const Nav3 = createDrawerNavigator({
   ProfileScreen: {
@@ -106,24 +91,17 @@ const Nav3 = createDrawerNavigator({
       drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
     }
   },
-  Bookmarks : {
-    screen : Bookmarks,
-    navigationOptions: {
-      title : 'My Bookmarks',
-      drawerIcon : ({ tintColor }) => IconBottomNav('bookmarks', tintColor)
-    }
-  },
   Settings : {
     screen : Settings,
     navigationOptions: {
-      title : 'My Settings',
+      title : 'Settings',
       drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
     }
   }
 },{
   contentComponent : DrawerComponent,
   drawerWidth: Dimensions.get('window').width - 100
-});;
+});
 
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );

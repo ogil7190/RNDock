@@ -41,7 +41,7 @@ class FlatCardHorizontal extends Component {
     const dimensions = Dimensions.get('window');
     return (
       <TouchableWithoutFeedback onPress={ () => this.props.onPress(this.props.data, this.card)}>
-        <View ref={(viewRef) => this.card = viewRef} style = {{height : 220,  width : 0.85 * dimensions.width, marginBottom : 15, shadowOpacity : 0.4, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:15, margin : 10, marginRight : 5, marginLeft : 15}}>
+        <View ref={(viewRef) => this.card = viewRef} style = {{height : 220,  width : 0.75 * dimensions.width, marginBottom : 15, shadowOpacity : 0.4, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:15, margin : 10, marginRight : 5, marginLeft : 15}}>
           <View >
             <View>
               <FastImage

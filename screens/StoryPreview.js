@@ -15,6 +15,7 @@ class PreviewStory extends Component {
       current : 0,
       poll : null,
       fetched : false,
+      updated : false
     };
   }
 
@@ -26,6 +27,16 @@ class PreviewStory extends Component {
 
   componentDidMount(){
     StatusBar.setHidden(true);
+    const data = this.props.navigation.getParam('item', []);
+    const updates_only = this.props.navigation.getParam('updates_only', null);
+    if(updates_only){
+      for(var i=0; i< data.length; i++){
+        if(data[i].watched !== 'true'){
+          this.setState({current : i});
+          break;
+        }
+      }
+    }
   }
 
   static navigationOptions = {
@@ -45,7 +56,7 @@ class PreviewStory extends Component {
     Realm.getRealm((realm) => {
       let poll = realm.objects('Activity').filtered('_id = "' + _id + '"');
       this.process_realm_obj(poll, (result) => {
-        this.setState({poll : result[0], fetched});
+        this.setState({poll : result[0], fetched}); /* TRY TO REMOVE THIS SET STATE IN RENDER */
       });
     });
   }
@@ -110,7 +121,6 @@ class PreviewStory extends Component {
           'x-access-token': token
         }
       }).then(async (response) => {
-        console.log(response);
         if(!response.data.error){
           Realm.getRealm((realm) => {
             realm.write(() => {
@@ -201,7 +211,6 @@ class PreviewStory extends Component {
   }
 
   getPostImgType = (item) =>{
-    console.log(item);
     return (
       <View style={{flex : 1}}>
         <FastImage
@@ -238,23 +247,34 @@ class PreviewStory extends Component {
     };
   }
 
+  update = (obj) =>{
+    Realm.getRealm((realm) => {
+      realm.write(() => {
+        realm.create('Activity', {_id : obj._id, watched : 'true'}, true);
+      });
+    });
+  }
+
   render() {
     const { navigation } = this.props;
     const {goBack} = this.props.navigation;
     const data = navigation.getParam('item', []);
+    const open = navigation.getParam('open', true);
     const size = data.length;
     const dim = Dimensions.get('window');
+    this.update(open ? data[this.state.current].item : data[this.state.current]);
     return(
       <Swiper
         loop={false}
-        onIndexChanged = {(index)=>this.setState({current : index})}
+        onIndexChanged = {(index)=>this.setState({current : index, updated : false})}
         showsButtons = {true}
-        prevButton = { <Text style={{width : dim.width / 2 - 80, height : dim.height - 100, color : 'transparent'}}>‹</Text> }
-        nextButton = { <Text style={{width : dim.width / 2 - 80, height : dim.height - 100, color : 'transparent'}}>›</Text>}
+        index = {this.state.current}
+        prevButton = { <Text style={{width : dim.width / 2 - 80, height : dim.height - 80, color : 'transparent', marginBottom : -80}}>‹</Text> }
+        nextButton = { <Text style={{width : dim.width / 2 - 80, height : dim.height - 80, color : 'transparent', marginBottom : -80}}>›</Text>}
         showsPagination={false}>
         {
           Object.entries(data).map((obj, index)=>{
-            const item = size > 1 ? obj[1] : obj[1].item;
+            const item = open ? obj[1].item : obj[1];
             return(<View style={{flex : 1, backgroundColor : '#000'}} key={index}>
               <View style ={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
                 <Text style={{fontSize : 20, margin : 10, color : '#fff', fontWeight : '500'}}>{ (this.state.current + 1) + '/' + size}</Text>

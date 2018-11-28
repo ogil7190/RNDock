@@ -6,7 +6,7 @@ import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import Swiper from 'react-native-swiper';
 import axios from 'axios';
-import Realm from '../realmdb';
+import Realm from '../../realmdb';
 
 class PreviewStory extends Component {
   constructor(props) {
@@ -27,8 +27,8 @@ class PreviewStory extends Component {
 
   componentDidMount(){
     StatusBar.setHidden(true);
-    const data = this.props.navigation.getParam('item', []);
-    const updates_only = this.props.navigation.getParam('updates_only', null);
+    const data = this.props.item;
+    const updates_only = this.props.updates_only;
     if(updates_only){
       for(var i=0; i< data.length; i++){
         if(data[i].watched !== 'true'){
@@ -46,8 +46,8 @@ class PreviewStory extends Component {
   getPostType = (item) =>{
     const len = item.message.split(' ').length / 2;
     return (
-      <LinearGradient colors={['rgb(224, 62, 99)', 'rgb(224, 62, 99)', 'rgb(240, 120, 57)']}  style={{backgroundColor : 'red', flex : 1, justifyContent : 'center', alignItems : 'center', borderTopLeftRadius : 15, borderTopRightRadius : 15}}>
-        <Text style={{fontSize : 40 - 1 * len, padding : 5, margin : 10, color : '#fff', textAlign : 'center',}}>{item.message}</Text>
+      <LinearGradient colors={['rgb(224, 62, 99)', 'rgb(224, 62, 99)', 'rgb(240, 120, 57)']}  style={{backgroundColor : 'red', flex : 1, justifyContent : 'center', alignItems : 'center', borderTopLeftRadius : 15, borderTopRightRadius : 15, borderRadius : 15}}>
+        <Text style={{fontSize : 40 - 1 * len, padding : 5, margin : 15, color : '#fff', textAlign : 'center',}}>{item.message}</Text>
       </LinearGradient>
     );
   }
@@ -67,7 +67,7 @@ class PreviewStory extends Component {
     }
     const len = item.message.split(' ').length / 2;
     return (
-      this.state.poll  ? <LinearGradient colors={['rgb(224, 62, 99)', 'rgb(224, 62, 99)', 'rgb(240, 120, 57)']}  style={{backgroundColor : 'red', flex : 1, paddingTop : 10, borderTopLeftRadius : 15, borderTopRightRadius : 15}}>
+      this.state.poll  ? <LinearGradient colors={['rgb(224, 62, 99)', 'rgb(224, 62, 99)', 'rgb(240, 120, 57)']}  style={{backgroundColor : 'red', flex : 1, paddingTop : 10, borderTopLeftRadius : 15, borderTopRightRadius : 15, borderRadius : 15}}>
         <Text style={{fontSize : 40 - 1 * len, padding : 5, margin : 10, color : '#fff', textAlign : 'center',}}>{item.message}</Text>
         <View style={{marginLeft : 20, marginRight : 20, justifyContent : 'center', flex : 1, alignItems : 'center'}}>
           {
@@ -82,7 +82,6 @@ class PreviewStory extends Component {
     const str = await AsyncStorage.getItem('data');
     const data = JSON.parse(str);
     const token = data.token;
-    const {goBack} = this.props.navigation;
     if( token === null) return;
     axios.post('https://mycampusdock.com/channels/user/answer-poll', {_id, option}, {
       headers: {
@@ -95,8 +94,8 @@ class PreviewStory extends Component {
           realm.write(() => {
             realm.create('Activity', {_id, answered : option, options : JSON.stringify(response.data.data.options)}, true);
           });
+          //this.setPoll(_id, true);
         });
-        goBack();
       }
     });
   }
@@ -272,9 +271,8 @@ class PreviewStory extends Component {
   }
 
   render() {
-    const { navigation } = this.props;
-    const data = navigation.getParam('item', []);
-    const open = navigation.getParam('open', true);
+    const data = this.props.item;
+    const open = this.props.open;
     const size = data.length;
     const dim = Dimensions.get('window');
     this.update(open ? data[this.state.current].item : data[this.state.current]);
@@ -305,7 +303,10 @@ class PreviewStory extends Component {
 }
 
 PreviewStory.propTypes = {
-  navigation: PropTypes.object.isRequired,
+  item : PropTypes.array,
+  open : PropTypes.bool,
+  onClose : PropTypes.func,
+  updates_only : PropTypes.bool
 };
 
 export default PreviewStory;

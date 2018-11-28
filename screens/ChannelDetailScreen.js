@@ -7,15 +7,26 @@ import axios from 'axios';
 import Realm from '../realmdb';
 import Story from './components/Story';
 import Swiper from 'react-native-swiper';
-import FlatCardList from './components/FlatCardList';
+import FlatCardHorizontal from './components/FlatCardHorizontal';
+import CustomList from './components/CustomList';
+import Modal from 'react-native-modalbox';
+import PreviewStory from './components/PreviewStory';
 
 class ChannelDetailScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.modal = null;
+  }
+
   state = {
     isRefreshing : false,
-    sorted_activities : null,
     token : null,
     tab : 0,
+    posts : [],
+    events : [],
     channel : null,
+    sorted_activities : null,
+    story_data : []
   }
 
   static navigationOptions = {
@@ -160,7 +171,7 @@ class ChannelDetailScreen extends Component {
           this.process_realm_obj(Activity, (activities) => {
             let sorted_activities = this.handleResponse(activities);
             this.fetch_events(channel_id, (events)=>{
-              this.setState({channel : channels[0], sorted_activities, events}, ()=>callback(true));
+              this.setState({channel : channels[0], sorted_activities, posts : activities, events}, ()=>callback(true));
             });
           });
         } else{
@@ -249,6 +260,16 @@ class ChannelDetailScreen extends Component {
     });
   }
 
+  showStory = (data, open) =>{
+    this.setState({story_data : data, open}, ()=>{
+      this.modal.open();
+    });
+  }
+
+  //this.props.navigation.navigate('StoryPreview', {item : data[1], open : false})
+
+  //this.props.navigation.navigate('StoryPreview', {item : [item], open : true})
+
   getMini = () =>{
     return(
       <View style={{flex : 1}}>
@@ -266,17 +287,16 @@ class ChannelDetailScreen extends Component {
           scrollEnabled ={false}
           index={this.state.tab}
           showsPagination={false}>
-
-          <ScrollView style={{flex : 1}}>
+          <View>
             {
               Object.keys(this.state.sorted_activities).length > 0 ? Object.entries(this.state.sorted_activities).map((data, index) =>
-                <View  key= {index} style={{backgroundColor : 'rgb(250, 250, 250)'}}>
-                  <View style={{flexDirection : 'row', margin : 10}}>
+                <View  key= {index} style={{backgroundColor : '#fff'}}>
+                  <View style={{flexDirection : 'row', marginTop : 10,}}>
                     <View style={{backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, paddingRight : 10, paddingLeft : 10}} >
                       <Text style={{fontSize : 15, padding : 5, paddingRight : 10, paddingLeft : 10}}>{data[0]}</Text>
                     </View>
                     <View style={{flex : 1}}/>
-                    <TouchableOpacity style={{width : 35, backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, justifyContent : 'center'}} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : data[1], open : false})}>
+                    <TouchableOpacity style={{width : 35, marginRight : 5, backgroundColor : '#efefef', shadowOpacity : 0.3, shadowOffset : {width : 1, height : 1}, elevation : 3, borderRadius : 20, justifyContent : 'center'}} onPress={()=>this.showStory(data[1], false)}>
                       <Text style={{fontSize : 15, textAlign : 'center', paddingLeft : 3}}><Icon name='play' style={{fontSize : 30}} /></Text>
                     </TouchableOpacity>
                   </View>
@@ -284,20 +304,23 @@ class ChannelDetailScreen extends Component {
                     style={{paddingTop : 10}}
                     keyExtractor={(item, index) => index.toString()}
                     data={data[1]}
-                    numColumns = {3}
-                    renderItem={(item)=> <Story data = {item} onPress={()=>this.props.navigation.navigate('StoryPreview', {item : [item], open : true})}/>} /> 
-                </View> ) : <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 10}}><Text style={{fontSize : 20, color : '#a5a5a5'}}>No Recent Activity</Text></View>
+                    horizontal = {true}
+                    renderItem={(item)=> <Story data = {item} onPress={()=>this.showStory([item], true)}/>} /> 
+                </View> ) : <Text style={{fontSize : 20, color : '#a5a5a5', marginTop : 10, textAlign : 'center'}}>No Recent Post</Text>
             }
-          </ScrollView>
+          </View>
           <View>
             {
               this.state.events.length > 0 
-                ? <FlatList
+                ? <CustomList
                   style={{paddingLeft : 20, paddingRight : 20, paddingTop : 10}}
-                  keyExtractor={(item, index) => index.toString()}
                   data={this.state.events}
-                  renderItem={({item}) => <FlatCardList image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
-                : <Text style={{fontSize : 20, color : '#a5a5a5', marginTop : 10, textAlign : 'center'}}>No Recent Events</Text>
+                  title = "Events"
+                  automaticTitle = {false}
+                  showTitle = {false}
+                  isHorizontal = {true}
+                  onRender={({item}) => <FlatCardHorizontal image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
+                : <Text style={{fontSize : 20, color : '#a5a5a5', marginTop : 10, textAlign : 'center'}}>No Recent Event</Text>
             }
           </View>
         </Swiper>
@@ -312,7 +335,7 @@ class ChannelDetailScreen extends Component {
       return(this.getMini());
     } else {
       return (
-        <View style={{flex : 1, justifyContent : 'center', alignItems : 'center'}}>
+        <View style={{flex : 1, justifyContent : 'center', alignItems : 'center', marginTop : 20}}>
           <View style={{width : 100, height : 100, borderWidth : 3, borderRadius : 50, borderColor : '#c5c5c5', padding : 10}}>
             <Icon name = 'lock' style={{fontSize : 72, textAlign : 'center', color : '#a5a5a5'}}/>
           </View>
@@ -360,58 +383,90 @@ class ChannelDetailScreen extends Component {
   render() {
     const {goBack} = this.props.navigation;
     return(
-      <View style={{ flex: 1, backgroundColor : '#efefef' }}>
+      <View style={{ flex: 1, backgroundColor : '#fff' }}>
         <StatusBar
           backgroundColor={'transparent'}
           translucent
           barStyle="dark-content"/>
 
-        <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, justifyContent : 'center', alignItems : 'center'}}>
-          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
-            <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginLeft : 10}}>
-              <Icon name="arrow-back" style={{ fontSize: 30, textAlign : 'center'}}/>
+        <View style = {{ flexDirection : 'row', backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20}}>
+          <View>
+            <TouchableOpacity onPress = {()=>goBack()} style= {{flexDirection : 'row', marginLeft : 5, marginRight : 5,  alignItems : 'center'}}>
+              <Icon name="arrow-back" style={{ fontSize: 25, margin : 5}}/>
+              <Text style={{fontSize : 18, marginLeft : 5}}>{'Back'}</Text>
             </TouchableOpacity>
-            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', paddingRight : 20,  alignContent : 'center'}}>{this.state.channel ? this.state.channel.name : 'Channel'}</Text>
           </View>
-        </View>
 
-        <View style={{padding : 20, backgroundColor : '#fff',}}>
-          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
+          <View style={{flex : 1}} />
+
+          <TouchableOpacity onPress = {()=>goBack()} style= {{padding : 5, marginRight : 10,}}>
+            <Icon name="more" style={{ fontSize: 30}}/>
+          </TouchableOpacity>
+        </View>
+      
+        <ScrollView>
+          <View style={{ paddingLeft : 10, paddingRight : 10, backgroundColor : '#fff', justifyContent : 'center', alignItems : 'center'}}>
             <FastImage
-              style={{height: 72, width: 72, borderRadius : 40, borderWidth : 1, borderColor : '#c5c5c5'}}
+              style={{height: 84, width: 84, borderRadius : 42, borderWidth : 1, borderColor : '#c5c5c5'}}
               source={{
                 uri : this.state.channel ? 'https://mycampusdock.com/' + JSON.parse(this.state.channel.media)[0] : 'NONE' ,
                 priority : FastImage.priority.high
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
-            <Text style={{fontSize : 18, textAlign : 'left', textAlignVertical : 'center', marginLeft : 10}}>{this.isChannel() ? this.state.channel.name : 'Loading'}</Text>
-          </View>
-          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
-            <Text style={{textAlign : 'center'}}>{this.isChannel() ? this.state.channel.description : 'Loading...'}</Text>
-          </View>
-          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center', marginLeft : 20, marginTop : 10}}>
-            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}} onPress={()=>this.showUsers()}>
-              <Text style={{fontSize : 15, textAlign : 'center', margin : 4}}>{this.isRefreshing() ? 'Loading' : this.isChannel() ? this.state.channel.followers === undefined ? 0 : this.state.channel.followers : '0'}</Text>
-              <Icon name = 'people' style={{margin : 5, fontSize : 25}}/>
-            </TouchableOpacity>
+            <Text style={{fontSize : 20, marginTop : 15 , textAlign : 'left', textAlignVertical : 'center', marginLeft : 10}}>{this.isChannel() ? this.state.channel.name : 'Loading'}</Text>
+            <Text style={{fontSize : 14, marginTop : 5, textAlign : 'left', textAlignVertical : 'center', marginLeft : 10, color : '#a5a5a5'}}>{this.isChannel() ? this.state.channel.category : 'Category'}</Text>
+            <Text style={{textAlign : 'center', marginTop : 10, fontSize : 15, color : '#222222'}}>{this.isChannel() ? this.state.channel.description : 'Loading...'}</Text>
+            <View style={{flexDirection : 'row', marginTop : 20}}>
+              <TouchableOpacity onPress = {this.handleMessage}>
+                <View style={{backgroundColor : '#fff', borderRadius : 50, padding : 5, borderColor : '#efefef', borderWidth : 2, justifyContent : 'center', alignItems : 'center'}}>
+                  <Icon name = 'chatbubbles' style={{fontSize : 28, color : 'rgb(31, 31, 92)', width : 30, height : 30, textAlign : 'center'}}/>
+                </View>
+              </TouchableOpacity>
+              <View style={{width : 15}} />
+              <TouchableOpacity onPress = {this.handleFollowPress}>
+                <View style={{backgroundColor : 'rgb(31, 31, 92)', borderRadius : 50, paddingLeft : 35, paddingRight : 35, padding : 5, justifyContent : 'center', alignItems : 'center'}}>
+                  <Text style={{fontSize : 18, textAlign : 'center', margin : 5, color : '#fff'}}>{ this.isRefreshing() ? 'Loading' : this.state.channel ? JSON.parse(this.state.channel.followed) ? 'Following' : this.isRequested() ? 'Requested' : 'Follow' : 'Loading'}</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{width : 15}} />
+              <TouchableOpacity onPress = {this.handleShare}>
+                <View style={{backgroundColor : '#fff', borderRadius : 50, padding : 5, borderColor : '#efefef', borderWidth : 2, justifyContent : 'center', alignItems : 'center'}}>
+                  <Icon name = 'settings' style={{ fontSize : 28, color : 'rgb(31, 31, 92)', width : 30, height : 30, textAlign : 'center'}}/>
+                </View>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5, justifyContent : 'center'}} onPress = {this.handleFollowPress}>
-              <Text style={{fontSize : 15, textAlign : 'center', margin : 4}}>{ this.isRefreshing() ? 'Loading' : this.state.channel ? JSON.parse(this.state.channel.followed) ? 'Following' : this.isRequested() ? 'Requested' : 'Follow' : 'Loading'}</Text>
-              <Icon name = {this.getActionIconName()} style={{margin : 5, fontSize : 22}}/>
-            </TouchableOpacity>
+            <View style={{flexDirection : 'row', marginTop : 25, marginBottom : 20}}>
+              <TouchableOpacity onPress={()=>this.showUsers()}>
+                <View style={{justifyContent : 'center', alignItems : 'center'}}>
+                  <Text style={{color : 'rgb(31, 31, 92)', fontSize : 25}}>{this.isRefreshing() ? 'Loading' : this.isChannel() ? this.state.channel.followers === undefined ? 0 : this.state.channel.followers : '0'}</Text>
+                  <Text style={{fontSize : 15}}>{'Followers'}</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{width : 2, backgroundColor : '#efefef', marginLeft : 20, marginRight : 20}}/>
 
-            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', borderWidth : 0.5, borderRadius : 5, margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
-              <Text style={{fontSize : 15, textAlign : 'center',  margin : 4}}>{this.state.isRefreshing ? 'Loading' : 'Settings'}</Text>
-              <Icon name = 'settings' style={{margin : 5, fontSize : 25}}/>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{flexDirection : 'row', alignItems : 'center', margin : 3, marginLeft : 5, marginRight : 5,  justifyContent : 'center'}}>
-              <Icon name = 'more' style={{margin : 5, fontSize : 25}}/>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={()=>this.setState({tab : 0})}>
+                <View style={{justifyContent : 'center', alignItems : 'center'}}>
+                  <Text style={{color : 'rgb(31, 31, 92)', fontSize : 25}}>{this.isRefreshing() ? 'Loading' : this.isChannel() ? this.state.posts === undefined ? 0 : this.state.posts.length : '0'}</Text>
+                  <Text style={{fontSize : 15}}>{'Posts'}</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{width : 2, backgroundColor : '#efefef', marginLeft : 20, marginRight : 20}}/>
+              
+              <TouchableOpacity onPress={()=>this.setState({tab : 1})}>
+                <View style={{justifyContent : 'center', alignItems : 'center'}}>
+                  <Text style={{color : 'rgb(31, 31, 92)', fontSize : 25}}>{this.isRefreshing() ? 'Loading' : this.isChannel() ? this.state.events === undefined ? 0 : this.state.events.length : '0'}</Text>
+                  <Text style={{fontSize : 15}}>{'Events'}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {this.getContent()} 
+          {this.getContent()}
+        </ScrollView>
+        <Modal swipeArea={500} ref={element => this.modal = element} coverScreen = {true} backdropPressToClose = {false} swipeThreshold = {80} isVisible = {false}>
+          <PreviewStory item = {this.state.story_data} updates_only = {false} open = {this.state.open} onClose = {()=>this.modal.close()}/>
+        </Modal>
       </View>
     );
   }

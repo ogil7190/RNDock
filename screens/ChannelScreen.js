@@ -154,12 +154,12 @@ class ChannelScreen extends Component {
           barStyle="light-content"/>
         <View style = {{ backgroundColor : 'rgb(31, 31, 92)', height : 80, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.6, shadowOffset : {width : 1, height : 1}, elevation : 6, paddingBottom : 5}}>
           <View style = {{ marginTop : Platform.OS === 'android' ? 25 : 10, flex : 1, flexDirection : 'row', paddingBottom : 5,}}>
-            <TouchableOpacity onPress = {()=>this.props.navigation.openDrawer()}>
-              <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
+            <TouchableOpacity style = {{backgroundColor : '#fff', borderRadius : 30, width : 35, height : 35,justifyContent : 'center', alignItems : 'center', marginLeft : 5}}>
+              <Icon style={{ color : 'rgb(31, 31, 92)', fontSize:25, padding:5}} name='notifications'/>
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity onPress = {()=>console.log('Search works here!')}>
-              <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' />
+            <TouchableOpacity style = {{backgroundColor : '#fff', borderRadius : 30, width : 35, height : 35,justifyContent : 'center', alignItems : 'center', marginRight : 5}} onPress={()=>this.props.navigation.navigate('SearchScreen', {data : {type : 'channels', placeholder : 'Search channels with name, type etc.'}})}>
+              <Icon style={{ color : 'rgb(31, 31, 92)', fontSize:25, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
         </View>
@@ -169,7 +169,7 @@ class ChannelScreen extends Component {
             <RefreshControl
               colors={['rgb(31, 31, 92)']}
               refreshing={this.state.isRefreshing}
-              onRefresh={this.fetch_channels}
+              onRefresh={()=>this.fetch_channels(this.state.token, this.state.college, ()=>console.log('done'))}
             />
           }>
           

@@ -101,7 +101,7 @@ class EventDetailScreen extends Component {
           el.reach = JSON.stringify(el.reach);
           el.views = JSON.stringify(el.views);
         });
-
+ 
         Realm.getRealm((realm) => {
           let data = response.data.data;
           if(data.length === 0) return;
@@ -109,7 +109,7 @@ class EventDetailScreen extends Component {
             let i;
             for(i=0;i<data.length;i++) {
               try {
-                realm.create('Events', {_id : data[i]._id, title : data[i].title, date : data[i].date, reg_start : data[i].reg_start, reg_end : data[i].reg_end, description : data[i].description, enrollees : data[i].enrollees, reach : data[i].reach, views : data[i].views, contact_details : JSON.stringify(data[i].contact_details), faq : data[i].faq}, true);
+                realm.create('Events', {_id : data[i]._id, title : data[i].title, date : data[i].date, reg_start : data[i].reg_start, reg_end : data[i].reg_end, description : data[i].description, enrollees : data[i].enrollees, enrolled : data[i].enrolled, reach : data[i].reach, views : data[i].views, contact_details : JSON.stringify(data[i].contact_details), faq : data[i].faq}, true);
               } catch(e) {
                 console.log('Realm', e);
               }
@@ -266,7 +266,7 @@ class EventDetailScreen extends Component {
             />
           </Animated.View>
           <Animated.View style={{ position: 'absolute', bottom: eventNameOffset, left: 0, right: 0, alignItems: 'center'}}>
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>{item.title}</Text>
+            <Text style={{ color: '#fff', fontWeight: 'bold', }}>{item.title}</Text>
           </Animated.View>
           
           <View

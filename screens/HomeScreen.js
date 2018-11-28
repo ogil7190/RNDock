@@ -10,6 +10,8 @@ import Icon from 'react-native-ionicons';
 import FlatCard from './components/FlatCard';
 import FlatCardHorizontal from './components/FlatCardHorizontal';
 import FirebaseModule from './FirebaseModule';
+import Modal from 'react-native-modalbox';
+import PreviewStory from './components/PreviewStory';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -17,6 +19,7 @@ class HomeScreen extends Component {
     this.fetch_event_data = this.fetch_event_data.bind(this);
     this.process_realm_obj = this.process_realm_obj.bind(this);
     this.update_user_token = this.update_user_token.bind(this);
+    this.modal = null;
   }
 
   async componentDidMount() {
@@ -42,7 +45,8 @@ class HomeScreen extends Component {
     isRefreshing: false,
     event_list: null,
     week_events : [],
-    channels : []
+    channels : [],
+    sorted_activities : {}
   }
 
   handleSubscription = async () =>{
@@ -304,8 +308,11 @@ class HomeScreen extends Component {
       this.process_realm_obj(Activity, (activities) => {
         let sorted_activities = this.handleResponse(activities);
         let keys = Object.keys(sorted_activities);
+        
         if(keys.length > 0){
-          this.props.navigation.navigate('StoryPreview', {item : sorted_activities[keys[0]], updates_only : true, open : false});
+          this.setState({sorted_activities}, ()=>{
+            this.modal.open();
+          });
         }
       });
     });
@@ -313,6 +320,7 @@ class HomeScreen extends Component {
 
   render() {
     const event_list = this.state.event_list === null ? [] : this.state.event_list;
+    let keys = Object.keys(this.state.sorted_activities);
     StatusBar.setHidden(false);
     return(
       <View style={{ flex: 1,backgroundColor : '#fff'}}>
@@ -320,19 +328,21 @@ class HomeScreen extends Component {
           backgroundColor="rgb(31, 31, 92)"
           translucent
           barStyle="light-content"/>
+          
         <View style = {{ backgroundColor : 'rgb(31, 31, 92)', height : 80, paddingTop : Platform.OS === 'android' ? 8 : 25, shadowOpacity : 0.6, shadowOffset : {width : 1, height : 1}, elevation : 6, paddingBottom : 5}}>
           <View style = {{ marginTop : Platform.OS === 'android' ? 25 : 10, flex : 1, flexDirection : 'row', paddingBottom : 5,}}>
-            <TouchableOpacity onPress = {()=>this.props.navigation.openDrawer()}>
-              <Icon style={{ color : '#fff', fontSize:35, padding : 5}} name='menu'/> 
+            <TouchableOpacity style = {{backgroundColor : '#fff', borderRadius : 30, width : 35, height : 35,justifyContent : 'center', alignItems : 'center', marginLeft : 5}}>
+              <Icon style={{ color : 'rgb(31, 31, 92)', fontSize:25, padding:5}} name='notifications'/>
             </TouchableOpacity>
             <Image style ={{width : 35, height : 35, tintColor :'#fff',flex:1, resizeMode:'contain'}}  source={require('./images/icon.png')} />
-            <TouchableOpacity>
-              <Icon style={{ color : '#fff', fontSize:35, padding:5}} name='search' onPress={this.unsave}/>
+            <TouchableOpacity style = {{backgroundColor : '#fff', borderRadius : 30, width : 35, height : 35,justifyContent : 'center', alignItems : 'center', marginRight : 5}} onPress={()=>this.props.navigation.navigate('SearchScreen', {data : {type : 'home', placeholder : 'Search events with the name, type, content, creator etc.'}})}>
+              <Icon style={{ color : 'rgb(31, 31, 92)', fontSize:25, padding:5}} name='search' />
             </TouchableOpacity>
           </View>
         </View>
+
         <ScrollView
-          style = {{backgroundColor: 'transparent'}}
+          style = {{backgroundColor: 'transparent',}}
           refreshControl={
             <RefreshControl
               colors={['rgb(31, 31, 92)']}
@@ -341,7 +351,7 @@ class HomeScreen extends Component {
             /> }>
 
           <CustomList 
-            title = "Channel Updates" 
+            title = "Channels Updates" 
             showTitle = {true}
             automaticTitle = {true}
             isHorizontal = {true}
@@ -364,6 +374,10 @@ class HomeScreen extends Component {
             isHorizontal = {false}
             onRender={({item}) => <FlatCard image = {'https://mycampusdock.com/' + JSON.parse(item.media)[0]} title = {item.title} channel = {item.channel_name} data = {item} onPress = {()=> this.props.navigation.navigate('EventDetailScreen', {item})} />}/>
         </ScrollView>
+
+        <Modal swipeArea={500} ref={element => this.modal = element} coverScreen = {true} backdropPressToClose = {false} swipeThreshold = {80} isVisible = {false}>
+          <PreviewStory item = {this.state.sorted_activities[keys[0]]} updates_only = {true} open = {false} onClose = {()=>this.modal.close()}/>
+        </Modal>
       </View>
     );
   }

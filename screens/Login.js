@@ -51,7 +51,7 @@ class Login extends Component {
     await GoogleSignin.configure({
       ...configPlatform,
       webClientId: '',
-      offlineAccess: false,
+      serverClientID : '7449865696-8b5pklakjgf9cr1mh3e5hslj48v12org.apps.googleusercontent.com'
     });
   }
 
@@ -92,33 +92,38 @@ class Login extends Component {
   signIn = async (data)=>{
     this.setState({error_text : null});
     axios.post('https://mycampusdock.com/auth/signin', {email : data.email, token : data.idToken}).then(async (response) =>{
-      this.props.login_success(data, response.data.token);
-      this.setState({loading : false});
-      if(response.data.newUser){
-        const actionToDispatch = StackActions.reset({
-          index: 0,
-          key: null,
-          actions: [NavigationActions.navigate({ routeName: 'CreateProfileScreen' })],
-        });
-        this.props.navigation.dispatch(actionToDispatch);
-      } else {
-        await this.update(JSON.stringify(response.data));
-        if(response.data.data.interests === undefined){
-          await AsyncStorage.setItem('interest', '0');
+      if(response.data.error){
+        console.log(response.data);
+        this.setState({error_text : 'Something went wrong :( Try Again!'});
+      } else{
+        this.props.login_success(data, response.data.token);
+        this.setState({loading : false});
+        if(response.data.newUser){
           const actionToDispatch = StackActions.reset({
             index: 0,
             key: null,
-            actions: [NavigationActions.navigate({ routeName: 'InterestSelectionScreen', })],
+            actions: [NavigationActions.navigate({ routeName: 'CreateProfileScreen' })],
           });
           this.props.navigation.dispatch(actionToDispatch);
         } else {
-          await AsyncStorage.setItem('interest', '1');
-          const actionToDispatch = StackActions.reset({
-            index: 0,
-            key: null,
-            actions: [NavigationActions.navigate({ routeName: 'Main', })],
-          });
-          this.props.navigation.dispatch(actionToDispatch);
+          await this.update(JSON.stringify(response.data));
+          if(response.data.data.interests === undefined){
+            await AsyncStorage.setItem('interest', '0');
+            const actionToDispatch = StackActions.reset({
+              index: 0,
+              key: null,
+              actions: [NavigationActions.navigate({ routeName: 'InterestSelectionScreen', })],
+            });
+            this.props.navigation.dispatch(actionToDispatch);
+          } else {
+            await AsyncStorage.setItem('interest', '1');
+            const actionToDispatch = StackActions.reset({
+              index: 0,
+              key: null,
+              actions: [NavigationActions.navigate({ routeName: 'Main', })],
+            });
+            this.props.navigation.dispatch(actionToDispatch);
+          }
         }
       }
     }).catch((err)=>{
@@ -135,11 +140,13 @@ class Login extends Component {
     this.setState({loading : true});
     try {
       const user = await GoogleSignin.signIn();
+      console.log(user);
       this.signIn(user);
     } catch (error) {
       if (error.code === 'CANCELED') {
         error.message = 'user canceled the login flow';
       }
+      console.log(error);
     }
     this.setState({
       loading: false 
@@ -296,7 +303,7 @@ const styles = StyleSheet.create({
   },
   error_style : {
     fontSize : 15,
-    color : 'red',
+    color : 'orange',
     textAlign : 'center'
   }
 });

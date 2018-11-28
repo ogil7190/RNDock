@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { View, Dimensions,Text, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-ionicons';
+import { View,Text, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
-import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 
 class ChannelCard extends Component {
@@ -11,10 +9,51 @@ class ChannelCard extends Component {
   }
 
   render() {
-    const dimensions = Dimensions.get('window');
     return (
       <TouchableOpacity onPress = {()=> this.props.onPress()}>
-        <View style = {{height : 120, width : 0.6 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
+        <View style={{shadowOpacity : 0.3, shadowOffset : {width : 1, height : 3}, elevation : 3, marginBottom : 10, margin : 5}}>
+          <View style={{width : 180, height : 180}}>
+            <View style={{flex : 6, backgroundColor : '#efefef', borderTopLeftRadius : 10, borderTopRightRadius : 10, justifyContent : 'center', alignItems : 'center'}}>
+              <FastImage
+                style={{width : 84, height : 84, borderRadius : 50}}
+                source={{
+                  uri : 'https://mycampusdock.com/' +  ( typeof this.props.data.media === 'string' ? JSON.parse(this.props.data.media)[0] : this.props.data.media[0] ),
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+            </View>
+            
+            <View style={{flex : 3, backgroundColor : '#fff', justifyContent : 'center', alignItems : 'center', borderBottomRightRadius : 8, borderBottomLeftRadius : 8}}>
+              <Text 
+                ellipsizeMode='tail' 
+                numberOfLines={1}
+                style={{marginLeft : 15, marginRight : 15, fontSize : 16}}>
+                {this.props.data.name}
+              </Text>
+
+              <Text 
+                ellipsizeMode='tail' 
+                numberOfLines={1}
+                style={{marginLeft : 15, color : '#a5a5a5', marginRight : 15, fontSize : 14}}>
+                {this.props.data.category}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+}
+
+ChannelCard.propTypes = {
+  data : PropTypes.object.isRequired,
+  onPress : PropTypes.func.isRequired
+};
+
+export default ChannelCard;
+
+/*
+<View style = {{height : 120, width : 0.6 * dimensions.width, marginLeft : 20, marginBottom :10, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 6, backgroundColor: 'black', borderRadius:8}}>
           <View style = {{borderRadius : 8, overflow:'hidden'}}>
             <View cardBody>
               <FastImage
@@ -56,14 +95,4 @@ class ChannelCard extends Component {
             </View>
           </View>
         </View>
-      </TouchableOpacity>
-    );
-  }
-}
-
-ChannelCard.propTypes = {
-  data : PropTypes.object.isRequired,
-  onPress : PropTypes.func.isRequired
-};
-
-export default ChannelCard;
+*/

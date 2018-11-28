@@ -11,98 +11,18 @@ import HomeScreen from './screens/HomeScreen';
 import ChannelScreen from './screens/ChannelScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import logger from 'redux-logger';
-import {DeviceEventEmitter, Dimensions, SafeAreaView, View, Image, ScrollView} from 'react-native';
+import {DeviceEventEmitter} from 'react-native';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from 'react-native-ionicons';
 import CheckOutEvent from './screens/CheckOutEvent';
-import { createDrawerNavigator, DrawerItems } from 'react-navigation';
-import MyEvents from './screens/MyEvents';
-import Settings from './screens/Settings';
 import StoryPreview from './screens/StoryPreview';
 import InterestSelectionScreen from './screens/InterestSelectionScreen';
 import ChannelDetailScreen from './screens/ChannelDetailScreen';
 import ChannelUsersScreen from './screens/ChannelUsersScreen';
-
-const DrawerComponent = (props) =>(
-  <SafeAreaView style={{flex : 1}}>
-    <View style={{height : 150, backgroundColor : 'rgb(31, 31, 92)', justifyContent : 'center', alignItems : 'center', paddingTop : 20, paddingBottom :20}}>
-      <Image source={require('./screens/images/icon.png')} style={{height : 100, width : 100, borderRadius : 50, tintColor : '#fff'}} />
-    </View>
-    <ScrollView>
-      <DrawerItems {...props}/>
-    </ScrollView>
-  </SafeAreaView>
-);
-
-const Nav = createDrawerNavigator({
-  HomeScreen: {
-    screen: HomeScreen,
-  },
-  MyEvents : {
-    screen: MyEvents,
-    navigationOptions: {
-      title : 'My Events',
-      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
-    }
-  },
-  Settings : {
-    screen : Settings,
-    navigationOptions: {
-      title : 'Settings',
-      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
-    }
-  }
-},{
-  contentComponent : DrawerComponent,
-  drawerWidth: Dimensions.get('window').width - 100
-});
-
-const Nav2 = createDrawerNavigator({
-  ChannelScreen: {
-    screen: ChannelScreen,
-  },
-  MyEvents : {
-    screen: MyEvents,
-    navigationOptions: {
-      title : 'My Events',
-      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
-    }
-  },
-  Settings : {
-    screen : Settings,
-    navigationOptions: {
-      title : 'Settings',
-      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
-    }
-  }
-},{
-  contentComponent : DrawerComponent,
-  drawerWidth: Dimensions.get('window').width - 100
-});
-
-const Nav3 = createDrawerNavigator({
-  ProfileScreen: {
-    screen: ProfileScreen,
-  },
-  MyEvents : {
-    screen: MyEvents,
-    navigationOptions: {
-      title : 'My Events',
-      drawerIcon : ({ tintColor }) => IconBottomNav('albums', tintColor)
-    }
-  },
-  Settings : {
-    screen : Settings,
-    navigationOptions: {
-      title : 'Settings',
-      drawerIcon : ({ tintColor }) => IconBottomNav('settings', tintColor)
-    }
-  }
-},{
-  contentComponent : DrawerComponent,
-  drawerWidth: Dimensions.get('window').width - 100
-});
-
+import SearchScreen from './screens/SearchScreen';
+import UserPreview from './screens/UserPreview';
+import SettingsScreen from './screens/SettingsScreen';
+import ListScreen from './screens/ListScreen';
 
 const store = createStore( combineReducers({ auth, general }), applyMiddleware(logger) );
 
@@ -113,28 +33,28 @@ const Screens = createStackNavigator({
   Main: { 
     screen: createBottomTabNavigator({
       HomeScreen: {
-        screen: Nav,
+        screen: HomeScreen,
         navigationOptions: {
           title: 'Home',
-          tabBarIcon: ({ tintColor }) => IconBottomNav('home', tintColor)
+          tabBarIcon: ({ tintColor }) => IconBottomNav('planet', tintColor)
         }
       },
       ChannelScreen: { 
-        screen: Nav2,
+        screen: ChannelScreen,
         navigationOptions: {
           title: 'Channels',
           tabBarIcon: ({ tintColor }) => IconBottomNav('glasses', tintColor)
         }
       },
       ProfileScreen: { 
-        screen: Nav3,
+        screen: ProfileScreen,
         navigationOptions: {
           title: 'Profile',
           tabBarIcon: ({ tintColor }) => IconBottomNav('person', tintColor)
         }
       }
     },{ tabBarOptions : {
-      showLabel : false,
+      showLabel : true,
       activeTintColor : 'orange',
       style : {height : 50, shadowOpacity : 0.5, shadowOffset : {width : 1, height : 1}, elevation : 5}
     }}),
@@ -143,12 +63,16 @@ const Screens = createStackNavigator({
     }),
   },
   EventDetailScreen: { screen: EventDetailScreen },
+  SearchScreen: { screen: SearchScreen },
   CreateProfileScreen : {screen : CreateProfileScreen},
   InterestSelectionScreen : {screen : InterestSelectionScreen},
   CheckOutEvent : { screen : CheckOutEvent},
   StoryPreview : { screen : StoryPreview},
   ChannelDetailScreen : { screen : ChannelDetailScreen},
   ChannelUsersScreen : { screen : ChannelUsersScreen},
+  UserPreview : { screen : UserPreview},
+  SettingsScreen : { screen : SettingsScreen},
+  ListScreen : { screen : ListScreen},
 });
 
 export default class App extends Component {

@@ -55,19 +55,20 @@ class CheckOutEvent extends Component {
           'Content-Type': 'application/json',
           'x-access-token': token
         }
-      }).then( response => {
+      }).then(response => {
+        console.log(response.data);
         if(!response.data.error){
-          this.setState({enrolled : true});
           Realm.getRealm((realm) => {
             realm.write(() => {
               realm.create('Events', {_id : item._id, enrolled : JSON.stringify(response.data.data)}, true);
+              this.setState({enrolled : true, loading : false});
             });
           });
         }
       }).catch(e =>{
         console.log('error', e);
+        this.setState({loading : false});
       });
-      this.setState({loading : false});
     }
   }
 
@@ -76,21 +77,29 @@ class CheckOutEvent extends Component {
     const item = navigation.getParam('item', {});
     const {goBack} = this.props.navigation;
     return (
-      <View style={{ flex: 1, backgroundColor : '#efefef' }}>
+      <View style={{ flex: 1, backgroundColor : '#ffffff' }}>
         <StatusBar
           backgroundColor={'transparent'}
           translucent
           barStyle="dark-content"/>
         <View style = {{ backgroundColor : 'transparent', height : Platform.OS === 'android' ? 70 : 65, paddingTop : Platform.OS === 'android'? 8 : 20, flex : 1}}>
-          <View style={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
-            <TouchableOpacity onPress = {()=>goBack()} style= {{marginTop : 15, marginLeft : 5}}>
-              <Icon name="arrow-back" style={{ color: '#000', fontSize: 30}}/>
+          <View style = {{ flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}}>
+            <View>
+              <TouchableOpacity onPress = {()=>goBack()} style= {{flexDirection : 'row', marginLeft : 5, marginRight : 5,  alignItems : 'center'}}>
+                <Icon name="arrow-back" style={{ fontSize: 25, margin : 5}}/>
+                <Text style={{fontSize : 18, marginLeft : 5}}>{'Back'}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{flex : 1}}/>
+  
+            <TouchableOpacity onPress = {()=>console.log('menu')} style= {{padding : 5, marginLeft : 5, marginRight : 5}}>
+              <Icon name="more" style={{ fontSize: 30}}/>
             </TouchableOpacity>
-            <Text style={{fontSize :20, textAlign : 'center', flex : 1, textAlignVertical : 'center', alignContent : 'center'}}>{ item.enrolled === 'false' ? 'Checkout Now' : 'Event Details'}</Text>
           </View>
           <ScrollView
             scrollEventThrottle={5}>
-            <View style={{flexDirection : 'row', marginTop: 15, padding : 10, backgroundColor : '#fff'}}>
+            <View style={{flexDirection : 'row', marginTop: 5, padding : 5, backgroundColor : '#fff'}}>
               <View style={{marginLeft : 15, marginTop : 10, flex : 3}}>
                 <Text style={{fontSize : 18}}>{item.title}</Text>
                 <Text style={{fontSize : 15, color : '#c5c5c5', marginTop : 5}}>{'Event by '+ (''+item.channel_name).toUpperCase()}</Text>
@@ -138,7 +147,7 @@ class CheckOutEvent extends Component {
                     bgColor='rgb(31, 31, 92)'
                     fgColor='white'/>
                   <Text style={{fontSize : 15, margin : 10}}>Verified Purchase  <Icon name = {'checkmark-circle'} style={{fontSize : 18, color : 'green'}}/></Text>
-                  <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10}}>[ Please show this QR Code to verify ticket ]</Text>
+                  <Text style={{fontSize : 15, marginTop : 10, marginBottom : 10, fontWeight : 'bold'}}>[ Please show this QR Code to verify ticket ]</Text>
                   <Text style={{fontSize : 15, marginTop : 15}}>Please do not forget to review this event.</Text>
                 </View>
             }

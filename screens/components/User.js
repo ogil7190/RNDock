@@ -17,17 +17,15 @@ class User extends Component {
     const name = item.split('-')[1];
     const url  = 'https://mycampusdock.com/' + 'image0-' + item + '.webp';
     return (
-      <View style={{flexDirection : 'row', backgroundColor : '#fff', margin : 5, padding : 5, borderRadius : 5, marginLeft : 10, marginRight : 10, justifyContent : 'center', alignItems : 'center'}}>
+      <View style={{flexDirection : 'row', backgroundColor : '#fff', margin : 5, padding : 5, borderRadius : 5, marginLeft : 10, marginRight : 10, justifyContent : 'center', alignItems : 'center',}}>
         <FastImage
-          style={{height: 72, width: 72, borderRadius : 40,}}
+          style={{height: 64, width: 64, borderRadius : 35,}}
           source={{
             uri : url,
-            priority : FastImage.priority.high
           }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <Text style={{flex : 1, fontSize : 18, marginLeft : 10}}>{name}</Text>
-        <TouchableOpacity style={{backgroundColor : 'orange', borderRadius : 20, padding : 10}}><Text style={{fontSize : 15, color : '#fff', paddingRight : 20, paddingLeft : 20}}>Ping</Text></TouchableOpacity>
+          resizeMode={FastImage.resizeMode.cover}/>
+        <Text style={{flex : 1, fontSize : 15, marginLeft : 10}}>{name}</Text>
+        <TouchableOpacity style={{backgroundColor : 'orange', borderRadius : 20, paddingLeft : 5, paddingRight : 5, padding : 8}}><Text style={{fontSize : 14, color : '#fff', paddingRight : 10, paddingLeft : 10}}>Ping</Text></TouchableOpacity>
       </View>
     );
   }

@@ -31,13 +31,16 @@ class CustomList extends Component {
     return (
       <View>
         {
-          showTitle ? <Text style={{fontSize : 18, marginLeft :15, marginTop : 10, marginBottom:5}}>
+          showTitle ? <Text style={{fontSize : 16, marginLeft :15, marginTop : 10, marginBottom:5}}>
             {'' + this.props.title}
             { this.props.showMark ? <Text  style={{color : 'red', fontSize : 25}}> • </Text> : ''}
           </Text> : <View/>
         }
         <View style={[this.props.style]}>
           <FlatList
+            ListHeaderComponent = {<View style={{width : 15}}/>}
+            ListFooterComponent = {<View style={{width : 15}}/>}
+            ItemSeparatorComponent = {({highlighted})=>(<View style={[{marginLeft : 5, marginRight : 5}, highlighted && {marginLeft: 5, marginRight : 5}]} />)}
             keyExtractor={(item) => item._id}
             data={this.props.data}
             horizontal = {this.props.isHorizontal ? true : false}

@@ -161,6 +161,7 @@ class ProfileScreen extends Component {
                   <Text style={{fontSize : 18, textAlign : 'center', margin : 5, color : '#fff'}}>{'Update Profile'}</Text>
                 </View>
               </TouchableOpacity>
+              
               <View style={{width : 15}} />
               <TouchableOpacity onPress = {() =>this.props.navigation.navigate('SettingsScreen')}>
                 <View style={{backgroundColor : '#fff', borderRadius : 50, padding : 5, borderColor : '#efefef', borderWidth : 2, justifyContent : 'center', alignItems : 'center'}}>
